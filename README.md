@@ -1,4 +1,4 @@
-# Django RDF Semantic Resume Agent 🧠🕸️
+# Django RDF Semantic Resume AAgent 🧠🕸️
 
 A lightweight, production-grade Django service that combines **RDF/Turtle (.ttl)** data modeling, local **SPARQL** querying via `rdflib`, and advanced LLM reasoning through **OpenRouter** (powered by NVIDIA Nemotron 3 Ultra).
 
