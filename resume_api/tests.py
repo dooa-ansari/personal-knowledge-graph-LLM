@@ -22,7 +22,7 @@ from .services.rdf_converter import (
     convert_resume_to_rdf,
 )
 from .services.sparql_service import execute_sparql_query, _serialize_rdf_term
-from .views import NATURAL_LANGUAGE_SYSTEM_PROMPT, SPARQL_SYSTEM_PROMPT
+from .prompts import NATURAL_LANGUAGE_SYSTEM_PROMPT, SPARQL_SYSTEM_PROMPT
 
 # Sample resume markdown content for testing
 SAMPLE_RESUME = """# **TEST USER**
