@@ -7,6 +7,7 @@ reference previous context (e.g., "What did she do there?" after asking
 "When did Dooa work at Greator?").
 """
 
+import logging
 from typing import TypedDict
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
@@ -23,6 +24,8 @@ from ..prompts import (
 )
 from .model_config import DEFAULT_MODEL
 from .sparql_service import execute_sparql_query
+
+logger = logging.getLogger(__name__)
 
 
 def _get_llm() -> ChatOpenAI:
@@ -63,6 +66,8 @@ def _generate_sparql_node(state: GraphState) -> GraphState:
 
     response = llm.invoke(messages)
     sparql_query = response.content.strip()
+
+    logger.info("Generated SPARQL query (LangGraph):\n%s", sparql_query)
 
     state["sparql_query"] = sparql_query
     return state

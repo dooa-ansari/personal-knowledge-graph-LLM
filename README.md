@@ -1,6 +1,6 @@
 # Django RDF Semantic Resume Agent 🧠🕸️
 
-A lightweight, production-grade Django service that combines **RDF/Turtle (.ttl)** data modeling, local **SPARQL** querying via `rdflib`, and advanced LLM reasoning through **OpenRouter** (powered by OpenAI GPT-OSS-20B).
+A lightweight, production-grade Django service that combines **RDF/Turtle (.ttl)** data modeling, local **SPARQL** querying via `rdflib`, and advanced LLM reasoning through **OpenRouter** (powered by Inclusion AI Ling 3.0 Flash).
 
 Instead of dumping raw documents or bloated text chunks into an LLM context window, this project implements a precise **GraphRAG-lite** pattern: translating natural language questions into deterministic SPARQL graph queries to eliminate hallucinations and extract exact background data.
 
@@ -20,7 +20,7 @@ Instead of dumping raw documents or bloated text chunks into an LLM context wind
 * **Backend:** Python, Django 5.2 (LTS)
 * **Semantic Graph Engine:** `rdflib` 7.1 (RDF parsing and SPARQL 1.1 engine)
 * **LLM Orchestration:** OpenAI-compatible API via OpenRouter (`requests` library)
-* **AI Model:** OpenAI GPT-OSS-20B via OpenRouter (`openai/gpt-oss-20b:free`) — configured centrally in `resume_api/services/model_config.py`
+* **AI Model:** Inclusion AI Ling 3.0 Flash via OpenRouter (`inclusionai/ling-3.0-flash`) — configured centrally in `resume_api/services/model_config.py`
 * **API Documentation:** Swagger / OpenAPI via `drf-yasg`
 * **Environment Management:** `python-dotenv`
 
@@ -128,7 +128,7 @@ curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph/ \
 ```json
 {
   "prompt": "What companies has the candidate worked at?",
-  "model": "openai/gpt-oss-20b:free",
+  "model": "inclusionai/ling-3.0-flash",
   "sparql_query": "PREFIX resume: <http://example.org/resume#> SELECT ?company WHERE { ... }",
   "query_results": {
     "columns": ["company"],
@@ -160,7 +160,7 @@ curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph-simple/ \
 ```json
 {
   "prompt": "What companies has the candidate worked at?",
-  "model": "openai/gpt-oss-20b:free",
+  "model": "inclusionai/ling-3.0-flash",
   "sparql_query": "PREFIX resume: <http://example.org/resume#> SELECT ?company WHERE { ... }",
   "query_results": {
     "columns": ["company"],
@@ -201,9 +201,9 @@ curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph-simple/ \
 
 ```mermaid
 flowchart TD
-    A[User Prompt] --> B["Step 1: SPARQL Generation<br/>OpenRouter (OpenAI GPT-OSS-20B)<br/>with SPARQL_SYSTEM_PROMPT"]
+    A[User Prompt] --> B["Step 1: SPARQL Generation<br/>OpenRouter (Inclusion AI Ling 3.0 Flash)<br/>with SPARQL_SYSTEM_PROMPT"]
     B --> C["Step 2: SPARQL Execution<br/>rdflib (local, deterministic)<br/>against All Details Resume.ttl"]
-    C --> D["Step 3: Natural Language Synthesis<br/>OpenRouter (OpenAI GPT-OSS-20B)<br/>with NATURAL_LANGUAGE_SYSTEM_PROMPT"]
+    C --> D["Step 3: Natural Language Synthesis<br/>OpenRouter (Inclusion AI Ling 3.0 Flash)<br/>with NATURAL_LANGUAGE_SYSTEM_PROMPT"]
     D --> E[API Response]
 
     style A fill:#4CAF50,color:#fff

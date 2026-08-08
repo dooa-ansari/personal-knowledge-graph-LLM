@@ -10,6 +10,8 @@ Unlike the LangGraph-based service, this has no conversation context,
 no session IDs, and no persisted state — each call is independent.
 """
 
+import logging
+
 from django.conf import settings
 
 from ..prompts import (
@@ -20,6 +22,8 @@ from ..prompts import (
 from .model_config import DEFAULT_MODEL
 from .openrouter_service import query_openrouter
 from .sparql_service import execute_sparql_query
+
+logger = logging.getLogger(__name__)
 
 
 def search_simple(prompt: str) -> dict:
@@ -53,6 +57,8 @@ def search_simple(prompt: str) -> dict:
         model=DEFAULT_MODEL,
         system_prompt=SPARQL_SYSTEM_PROMPT,
     ).strip()
+
+    logger.info("Generated SPARQL query (stateless search):\n%s", sparql_query)
 
     # Step 2: Execute the SPARQL query against the RDF knowledge graph
     query_results = execute_sparql_query(sparql_query)

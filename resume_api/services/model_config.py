@@ -7,4 +7,4 @@ DEFAULT_MODEL below — no other file needs to be modified.
 """
 
 # The default model used for all LLM calls
-DEFAULT_MODEL = "openai/gpt-oss-20b:free"
+DEFAULT_MODEL = "inclusionai/ling-3.0-flash"

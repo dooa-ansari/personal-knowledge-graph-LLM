@@ -312,7 +312,7 @@ class OpenRouterServiceTests(TestCase):
         call_args = mock_post.call_args
         self.assertEqual(call_args[0][0], "https://openrouter.ai/api/v1/chat/completions")
         self.assertEqual(call_args[1]["headers"]["Authorization"], "Bearer test-key")
-        self.assertEqual(call_args[1]["json"]["model"], "openai/gpt-oss-20b:free")
+        self.assertEqual(call_args[1]["json"]["model"], "inclusionai/ling-3.0-flash")
         self.assertEqual(call_args[1]["json"]["messages"][0]["content"], "test prompt")
 
     @patch("resume_api.services.openrouter_service.settings.OPENROUTER_API_KEY", "test-key")
@@ -435,7 +435,7 @@ class SearchKnowledgeGraphEndpointTests(TestCase):
         mock_search.return_value = {
             "prompt": "What is my name?",
             "session_id": "test-session-123",
-            "model": "openai/gpt-oss-20b:free",
+            "model": "inclusionai/ling-3.0-flash",
             "sparql_query": "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }",
             "query_results": {
                 "columns": ["name"],
@@ -453,7 +453,7 @@ class SearchKnowledgeGraphEndpointTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["prompt"], "What is my name?")
         self.assertEqual(response.data["session_id"], "test-session-123")
-        self.assertEqual(response.data["model"], "openai/gpt-oss-20b:free")
+        self.assertEqual(response.data["model"], "inclusionai/ling-3.0-flash")
         self.assertIn("sparql_query", response.data)
         self.assertIn("query_results", response.data)
         self.assertEqual(response.data["query_results"]["row_count"], 1)
@@ -469,7 +469,7 @@ class SearchKnowledgeGraphEndpointTests(TestCase):
         mock_search.return_value = {
             "prompt": "test",
             "session_id": "auto-generated-id",
-            "model": "openai/gpt-oss-20b:free",
+            "model": "inclusionai/ling-3.0-flash",
             "sparql_query": "SELECT * WHERE { ?s ?p ?o }",
             "query_results": {"columns": [], "rows": [], "row_count": 0},
             "answer": "No results found.",
@@ -559,7 +559,7 @@ class LangGraphServiceTests(TestCase):
 
         self.assertEqual(result["prompt"], "What is my name?")
         self.assertEqual(result["session_id"], "test-session-1")
-        self.assertEqual(result["model"], "openai/gpt-oss-20b:free")
+        self.assertEqual(result["model"], "inclusionai/ling-3.0-flash")
         self.assertIn("PREFIX", result["sparql_query"])
         self.assertEqual(result["query_results"]["row_count"], 1)
         self.assertEqual(result["answer"], "Your name is DOOA ANSARI.")
@@ -653,7 +653,7 @@ class SimpleSearchServiceTests(TestCase):
         result = search_simple("What is my name?")
 
         self.assertEqual(result["prompt"], "What is my name?")
-        self.assertEqual(result["model"], "openai/gpt-oss-20b:free")
+        self.assertEqual(result["model"], "inclusionai/ling-3.0-flash")
         self.assertIn("PREFIX", result["sparql_query"])
         self.assertEqual(result["query_results"]["row_count"], 1)
         self.assertEqual(result["answer"], "Your name is DOOA ANSARI.")
@@ -698,7 +698,7 @@ class SimpleSearchEndpointTests(TestCase):
         """Test that POST /api/search-knowledge-graph-simple/ returns 200 with natural language answer."""
         mock_search.return_value = {
             "prompt": "What is my name?",
-            "model": "openai/gpt-oss-20b:free",
+            "model": "inclusionai/ling-3.0-flash",
             "sparql_query": "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }",
             "query_results": {
                 "columns": ["name"],
@@ -715,7 +715,7 @@ class SimpleSearchEndpointTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["prompt"], "What is my name?")
-        self.assertEqual(response.data["model"], "openai/gpt-oss-20b:free")
+        self.assertEqual(response.data["model"], "inclusionai/ling-3.0-flash")
         self.assertIn("sparql_query", response.data)
         self.assertIn("query_results", response.data)
         self.assertEqual(response.data["query_results"]["row_count"], 1)
