@@ -142,7 +142,8 @@ def search_knowledge_graph(request):
         )
 
     # Generate a new session ID if none was provided
-    if not session_id:
+    # or if the Swagger UI placeholder value was sent
+    if not session_id or session_id == "string":
         session_id = str(uuid.uuid4())
 
     try:

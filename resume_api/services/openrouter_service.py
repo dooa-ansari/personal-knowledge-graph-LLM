@@ -8,7 +8,7 @@ from django.conf import settings
 
 def query_openrouter(
     prompt: str,
-    model: str = "nvidia/nemotron-3-ultra-550b-a55b:free",
+    model: str = "poolside/laguna-xs-2.1:free",
     system_prompt: str = None,
 ) -> str:
     """
@@ -16,7 +16,7 @@ def query_openrouter(
 
     Args:
         prompt: The user prompt to send to the model
-        model: The model identifier to use (defaults to nvidia/nemotron-3-ultra-550b-a55b:free)
+        model: The model identifier to use (defaults to poolside/laguna-xs-2.1:free)
         system_prompt: An optional system prompt to instruct the model's behavior
 
     Returns:

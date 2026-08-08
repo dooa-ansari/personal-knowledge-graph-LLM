@@ -24,7 +24,7 @@ from ..prompts import (
 from .sparql_service import execute_sparql_query
 
 # The default model used for LLM calls
-DEFAULT_MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free"
+DEFAULT_MODEL = "poolside/laguna-xs-2.1:free"
 
 
 def _get_llm() -> ChatOpenAI:
