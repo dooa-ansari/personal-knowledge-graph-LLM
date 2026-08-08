@@ -92,15 +92,7 @@ Your task is to:
 3. If the results are empty, explain that no matching data was found in the knowledge graph.
 4. Return ONLY the natural language response, without mentioning SPARQL, RDF, or technical details unless they are essential to the answer.
 
-Example:
-Input:
-{
-  "columns": ["company"],
-  "rows": [{"company": "DeepSkill GmbH"}, {"company": "Greator GmbH"}],
-  "row_count": 2
-}
-Output:
-"Dooa has worked for at 2 companies: DeepSkill GmbH and Greator GmbH."
+Return a concise answer based only on the supplied result rows.
 """
 
 

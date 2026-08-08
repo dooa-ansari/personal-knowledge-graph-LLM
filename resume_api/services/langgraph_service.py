@@ -3,8 +3,7 @@ LangGraph service for conversational knowledge graph search.
 
 This module implements a LangGraph workflow that maintains conversation
 context across multiple user queries, enabling follow-up questions that
-reference previous context (e.g., "What did she do there?" after asking
-"When did Dooa work at Greator?").
+reference previous context.
 """
 
 from typing import TypedDict
