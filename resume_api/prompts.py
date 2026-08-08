@@ -64,13 +64,18 @@ Instructions:
 
 IMPORTANT — Use fuzzy string matching:
 - When filtering on text fields (company, role, location, institution, name, etc.), use CONTAINS(LCASE(STR(?field)), "search term") instead of exact equality.
-- For example, to search for "Greator" in company names, use: FILTER(CONTAINS(LCASE(STR(?company)), "greator"))
-- To search for a person's name, use: FILTER(CONTAINS(LCASE(STR(?name)), "dooa"))
-- This ensures that partial matches work (e.g., "Greator" matches "Greator GmbH").
+- For a company search, use the user's lowercased search term: FILTER(CONTAINS(LCASE(STR(?company)), "<user-company-term>"))
+- For a person's name search, use the user's lowercased search term: FILTER(CONTAINS(LCASE(STR(?name)), "<user-name-term>"))
+- This ensures that partial matches work when the user's term is contained in the stored RDF value.
 - The person node can be identified by the type foaf:Person or schema:Person.
 - The person's name is stored under foaf:name.
 - Always use LCASE and STR inside CONTAINS for case-insensitive matching.
 - Do NOT use FILTER(LCASE(STR(?x)) = "exact") — always use CONTAINS instead.
+- IMPORTANT: CONTAINS is case-insensitive substring matching, not typo correction. Copy the user's search term exactly; do not silently remove, add, or substitute letters.
+- For names containing spaces, hyphens, or punctuation, normalize both sides before matching by removing separators with REPLACE, for example:
+  FILTER(CONTAINS(REPLACE(LCASE(STR(?field)), "[\\s\\-_]", "", "i"), REPLACE("user term", "[\\s\\-_]", "", "i")))
+- Use this normalized form when the user's wording may differ only by spacing or punctuation. Do not use it to invent spelling changes or guesses.
+- If the user's term may contain a spelling mistake, do not guess a replacement literal. Prefer a broader query that returns the relevant candidate values, so matching can be resolved from the returned data.
 """
 
 NATURAL_LANGUAGE_SYSTEM_PROMPT = """
