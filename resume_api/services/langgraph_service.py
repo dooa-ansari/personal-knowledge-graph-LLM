@@ -7,7 +7,6 @@ reference previous context (e.g., "What did she do there?" after asking
 "When did Dooa work at Greator?").
 """
 
-import logging
 from typing import TypedDict
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
@@ -23,10 +22,9 @@ from ..prompts import (
     build_results_prompt,
 )
 from .model_config import DEFAULT_MODEL
-from .sparql_service import execute_sparql_query
+from .sparql_service import execute_sparql_query, validate_sparql_query
 
-logger = logging.getLogger(__name__)
-
+MAX_SPARQL_GENERATION_ATTEMPTS = 2
 
 def _get_llm() -> ChatOpenAI:
     """
@@ -49,6 +47,9 @@ class GraphState(TypedDict):
     sparql_query: str
     query_results: dict
     answer: str
+    sparql_attempts: int
+    sparql_error: str
+    sparql_valid: bool
 
 
 def _generate_sparql_node(state: GraphState) -> GraphState:
@@ -63,14 +64,57 @@ def _generate_sparql_node(state: GraphState) -> GraphState:
     # Build messages: system prompt + conversation history
     messages = [SystemMessage(content=SPARQL_SYSTEM_PROMPT)]
     messages.extend(state["messages"])
+    if state.get("sparql_error"):
+        messages.append(
+            HumanMessage(
+                content=(
+                    "The previous generated SPARQL query was invalid. Parser error: "
+                    f"{state['sparql_error']}\n"
+                    "Regenerate the query and return only raw SPARQL without Markdown fences."
+                )
+            )
+        )
 
     response = llm.invoke(messages)
     sparql_query = response.content.strip()
 
-    logger.info("Generated SPARQL query (LangGraph):\n%s", sparql_query)
+    print(
+        f"\n===== Generated SPARQL query (LangGraph) =====\n{sparql_query}\n===== End SPARQL query =====\n",
+        flush=True,
+    )
 
     state["sparql_query"] = sparql_query
+    state["sparql_attempts"] = state.get("sparql_attempts", 0) + 1
     return state
+
+
+def _validate_sparql_node(state: GraphState) -> GraphState:
+    """Validate the generated query and store the result in graph state."""
+    try:
+        validate_sparql_query(state["sparql_query"])
+        state["sparql_valid"] = True
+        state["sparql_error"] = ""
+    except Exception as exc:
+        state["sparql_valid"] = False
+        state["sparql_error"] = str(exc)
+    return state
+
+
+def _route_after_validation(state: GraphState) -> str:
+    """Route valid queries to execution or invalid queries back for retry."""
+    if state.get("sparql_valid"):
+        return "execute_sparql"
+    if state.get("sparql_attempts", 0) < MAX_SPARQL_GENERATION_ATTEMPTS:
+        return "generate_sparql"
+    return "invalid_sparql"
+
+
+def _invalid_sparql_node(state: GraphState) -> GraphState:
+    """Stop the workflow after all SPARQL generation attempts fail."""
+    raise ValueError(
+        "Generated SPARQL query remained invalid after "
+        f"{state.get('sparql_attempts', 0)} attempts: {state.get('sparql_error', '')}"
+    )
 
 
 def _execute_sparql_node(state: GraphState) -> GraphState:
@@ -113,12 +157,24 @@ def _build_workflow():
     workflow = StateGraph(GraphState)
 
     workflow.add_node("generate_sparql", _generate_sparql_node)
+    workflow.add_node("validate_sparql", _validate_sparql_node)
     workflow.add_node("execute_sparql", _execute_sparql_node)
     workflow.add_node("generate_answer", _generate_answer_node)
+    workflow.add_node("invalid_sparql", _invalid_sparql_node)
 
-    workflow.add_edge("generate_sparql", "execute_sparql")
+    workflow.add_edge("generate_sparql", "validate_sparql")
+    workflow.add_conditional_edges(
+        "validate_sparql",
+        _route_after_validation,
+        {
+            "generate_sparql": "generate_sparql",
+            "execute_sparql": "execute_sparql",
+            "invalid_sparql": "invalid_sparql",
+        },
+    )
     workflow.add_edge("execute_sparql", "generate_answer")
     workflow.add_edge("generate_answer", END)
+    workflow.add_edge("invalid_sparql", END)
 
     workflow.set_entry_point("generate_sparql")
 
@@ -181,7 +237,7 @@ def search_with_context(session_id: str, prompt: str) -> dict:
 
     # Run the workflow
     result = _compiled_workflow.invoke(
-        {"messages": messages},
+        {"messages": messages, "sparql_attempts": 0},
         config=config,
     )
 

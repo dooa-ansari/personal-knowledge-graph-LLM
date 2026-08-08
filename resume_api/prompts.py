@@ -58,8 +58,9 @@ Instructions:
 1. Read the user's natural language question carefully.
 2. Construct a valid SPARQL SELECT query that answers the question.
 3. Use PREFIX declarations for foaf, schema, resume, and rdf.
-4. Return ONLY the SPARQL query, without any additional text, explanation, or markdown code fences.
-5. If the question cannot be translated to SPARQL, return a comment: # Unable to generate SPARQL query for this question.
+4. Return ONLY the raw SPARQL query. Do not include Markdown code fences such as ```sparql or ```.
+5. Do not include any explanation, introductory text, labels, comments, or text after the query. The very first character of your response must be `P` from `PREFIX` or `S` from `SELECT`.
+6. If the question cannot be translated to SPARQL, return a comment: # Unable to generate SPARQL query for this question.
 
 IMPORTANT — Use fuzzy string matching:
 - When filtering on text fields (company, role, location, institution, name, etc.), use CONTAINS(LCASE(STR(?field)), "search term") instead of exact equality.

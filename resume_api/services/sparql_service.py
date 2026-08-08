@@ -7,6 +7,14 @@ from pathlib import Path
 from rdflib import Graph
 
 
+def validate_sparql_query(query: str) -> None:
+    """Validate SPARQL syntax without executing the query.
+
+    Raises the parser exception when the query is invalid.
+    """
+    Graph().query(query)
+
+
 def execute_sparql_query(query: str, rdf_file_path: str = None) -> dict:
     """
     Execute a SPARQL query against the RDF knowledge graph (.ttl file).

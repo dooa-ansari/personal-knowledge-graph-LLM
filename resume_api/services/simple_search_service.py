@@ -10,8 +10,6 @@ Unlike the LangGraph-based service, this has no conversation context,
 no session IDs, and no persisted state — each call is independent.
 """
 
-import logging
-
 from django.conf import settings
 
 from ..prompts import (
@@ -21,10 +19,9 @@ from ..prompts import (
 )
 from .model_config import DEFAULT_MODEL
 from .openrouter_service import query_openrouter
-from .sparql_service import execute_sparql_query
+from .sparql_service import execute_sparql_query, validate_sparql_query
 
-logger = logging.getLogger(__name__)
-
+MAX_SPARQL_GENERATION_ATTEMPTS = 2
 
 def search_simple(prompt: str) -> dict:
     """
@@ -52,13 +49,34 @@ def search_simple(prompt: str) -> dict:
         )
 
     # Step 1: Translate the natural language question into a SPARQL query
-    sparql_query = query_openrouter(
-        prompt,
-        model=DEFAULT_MODEL,
-        system_prompt=SPARQL_SYSTEM_PROMPT,
-    ).strip()
+    generation_prompt = prompt
+    last_error = None
+    for attempt in range(1, MAX_SPARQL_GENERATION_ATTEMPTS + 1):
+        sparql_query = query_openrouter(
+            generation_prompt,
+            model=DEFAULT_MODEL,
+            system_prompt=SPARQL_SYSTEM_PROMPT,
+        ).strip()
 
-    logger.info("Generated SPARQL query (stateless search):\n%s", sparql_query)
+        try:
+            validate_sparql_query(sparql_query)
+            break
+        except Exception as exc:
+            last_error = exc
+            if attempt == MAX_SPARQL_GENERATION_ATTEMPTS:
+                raise ValueError(
+                    f"Generated SPARQL query remained invalid after {attempt} attempts: {exc}"
+                ) from exc
+            generation_prompt = (
+                f"{prompt}\n\nThe previous SPARQL query was invalid. "
+                f"Parser error: {exc}\n"
+                "Regenerate the query. Return only raw SPARQL without Markdown fences."
+            )
+
+    print(
+        f"\n===== Generated SPARQL query (stateless search) =====\n{sparql_query}\n===== End SPARQL query =====\n",
+        flush=True,
+    )
 
     # Step 2: Execute the SPARQL query against the RDF knowledge graph
     query_results = execute_sparql_query(sparql_query)
