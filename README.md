@@ -49,7 +49,7 @@ personal-knowledge-graph/
     ├── views.py               # API endpoints + system prompts
     ├── urls.py                # API URL routing
     ├── serializers.py         # DRF serializers for Swagger
-    ├── tests.py               # 50 unit tests
+    ├── tests.py               # 51 unit tests
     └── services/
         ├── rdf_converter.py   # Resume markdown → RDF converter
         ├── openrouter_service.py  # OpenRouter LLM client
@@ -224,13 +224,17 @@ The line `workflow.set_entry_point("generate_sparql")` declares **where executio
 ```mermaid
 flowchart TD
     StartNode["🟢 START"] --> SparqlNode["generate_sparql 🔵 (entry point)<br/>LLM: conversation history → SPARQL query<br/>via SPARQL_SYSTEM_PROMPT"]
-    SparqlNode --> ExecNode["execute_sparql 🟠<br/>rdflib runs query on All Details Resume.ttl<br/>stores results in state"]
+    SparqlNode --> ValidateNode["validate_sparql 🟡<br/>rdflib parses query syntax<br/>stores valid/error state"]
+    ValidateNode -->|"valid"| ExecNode["execute_sparql 🟠<br/>rdflib runs query on All Details Resume.ttl<br/>stores results in state"]
+    ValidateNode -->|"invalid + attempts remaining"| SparqlNode
+    ValidateNode -->|"invalid + retry limit reached"| InvalidNode["invalid_sparql 🔴<br/>raises validation error"]
     ExecNode --> AnsNode["generate_answer 🟣<br/>LLM: results → natural language answer<br/>appends AIMessage to history"]
     AnsNode --> EndNode["🔴 END"]
+    InvalidNode --> ErrorEnd["🔴 ERROR"]
     AnsNode --> RespNode["🟢 API Response<br/>sparql_query / query_results / answer"]
 
     subgraph Memory["Persisted state (MemorySaver, thread_id = session_id)"]
-        StateNode["GraphState: messages, sparql_query,<br/>query_results, answer"]
+        StateNode["GraphState: messages, sparql_query,<br/>query_results, answer, attempts, error, valid"]
     end
 
     AnsNode -->|"saves state"| StateNode
@@ -238,20 +242,23 @@ flowchart TD
 
     style StartNode fill:#4CAF50,color:#fff
     style SparqlNode fill:#2196F3,color:#fff
+    style ValidateNode fill:#FFC107,color:#000
     style ExecNode fill:#FF9800,color:#fff
     style AnsNode fill:#9C27B0,color:#fff
     style EndNode fill:#F44336,color:#fff
+    style InvalidNode fill:#F44336,color:#fff
+    style ErrorEnd fill:#F44336,color:#fff
     style StateNode fill:#607D8B,color:#fff
     style RespNode fill:#4CAF50,color:#fff
 ```
 
-This means every user turn always flows through the same pipeline: **translate conversation to SPARQL → execute locally on the RDF graph → synthesize a natural-language answer** — while the dashed lines show how prior turns are loaded from and saved back to the checkpointer, enabling follow-ups like *"What did she do there?"* to resolve correctly against earlier context.
+Each user turn follows **generate → validate → execute → answer**. If validation fails, the conditional edge sends the workflow back to `generate_sparql` while attempts remain; after the retry limit, `invalid_sparql` raises a clear error. The dashed lines show how prior turns and retry state are loaded from and saved to the checkpointer, enabling follow-ups like *"What did she do there?"*.
 
 ---
 
 ## 🧪 Testing
 
-Run the full test suite (50 tests):
+Run the full test suite (51 tests):
 
 ```bash
 python3 manage.py test resume_api -v 2
