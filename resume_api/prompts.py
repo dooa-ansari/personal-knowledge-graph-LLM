@@ -21,7 +21,7 @@ The knowledge graph uses the following namespaces:
 - resume: <http://example.org/resume#>
 - rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-The knowledge graph contains information about a person with these entity types:
+The knowledge graph contains information about a person (foaf:Person/schema:Person) with these entity types:
 - resume:ProfessionalExperience (properties: resume:company, resume:location, resume:dates, resume:role, resume:hasBulletPoint)
 - resume:BulletPoint (property: rdf:value)
 - resume:Education (properties: resume:institution, resume:dates, schema:educationalCredentialAwarded)
@@ -33,6 +33,24 @@ The knowledge graph contains information about a person with these entity types:
 - resume:SkillItem (property: rdf:value)
 - resume:Project (property: schema:name)
 - foaf:Person (properties: foaf:name, schema:jobTitle)
+
+CRITICAL — Linking predicates on the person node:
+The person node links to the entity types via these resume:has* predicates. You MUST use these to connect a person to their data, NOT the entity type names themselves:
+- ?person resume:hasProfessionalExperience ?exp .    (links to resume:ProfessionalExperience nodes)
+- ?person resume:hasEducation ?edu .                (links to resume:Education nodes)
+- ?person resume:hasLanguage ?lang .                (links to resume:Language nodes)
+- ?person resume:hasAcademicExperience ?academic .  (links to resume:AcademicExperience nodes)
+- ?person resume:hasSkillCategory ?category .       (links to resume:SkillCategory nodes)
+- ?person resume:hasSkillDetail ?detail .           (links to resume:SkillDetail nodes)
+- ?person resume:hasProject ?project .              (links to resume:Project nodes)
+
+For example, to find a person's work experience, use:
+  ?person a foaf:Person .
+  ?person resume:hasProfessionalExperience ?exp .
+  ?exp resume:company ?company .
+
+Do NOT use the entity type as a predicate (e.g., do NOT write `?person resume:ProfessionalExperience ?exp`).
+The entity types are used with `a` (rdf:type), e.g., `?exp a resume:ProfessionalExperience`.
 
 The person node can be identified by the type foaf:Person or schema:Person.
 
