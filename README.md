@@ -177,6 +177,40 @@ flowchart TD
 
 ---
 
+## 🔄 LangGraph Workflow (Conversational Search)
+
+The `/api/search-knowledge-graph/` endpoint is orchestrated by a **LangGraph StateGraph** built in `resume_api/services/langgraph_service.py`. Unlike a single-shot pipeline, this workflow maintains conversation context across turns using a `MemorySaver` checkpointer keyed by `thread_id` (the client-provided `session_id`).
+
+The line `workflow.set_entry_point("generate_sparql")` declares **where execution starts**: the **`generate_sparql`** node. Edges alone only describe transitions between nodes; this line anchors the graph so that `_compiled_workflow.invoke(...)` always begins at the SPARQL-generation step.
+
+```mermaid
+flowchart TD
+    StartNode["🟢 START"] --> SparqlNode["generate_sparql 🔵 (entry point)<br/>LLM: conversation history → SPARQL query<br/>via SPARQL_SYSTEM_PROMPT"]
+    SparqlNode --> ExecNode["execute_sparql 🟠<br/>rdflib runs query on All Details Resume.ttl<br/>stores results in state"]
+    ExecNode --> AnsNode["generate_answer 🟣<br/>LLM: results → natural language answer<br/>appends AIMessage to history"]
+    AnsNode --> EndNode["🔴 END"]
+    AnsNode --> RespNode["🟢 API Response<br/>sparql_query / query_results / answer"]
+
+    subgraph Memory["Persisted state (MemorySaver, thread_id = session_id)"]
+        StateNode["GraphState: messages, sparql_query,<br/>query_results, answer"]
+    end
+
+    AnsNode -->|"saves state"| StateNode
+    SparqlNode -.->|"loads conversation history"| StateNode
+
+    style StartNode fill:#4CAF50,color:#fff
+    style SparqlNode fill:#2196F3,color:#fff
+    style ExecNode fill:#FF9800,color:#fff
+    style AnsNode fill:#9C27B0,color:#fff
+    style EndNode fill:#F44336,color:#fff
+    style StateNode fill:#607D8B,color:#fff
+    style RespNode fill:#4CAF50,color:#fff
+```
+
+This means every user turn always flows through the same pipeline: **translate conversation to SPARQL → execute locally on the RDF graph → synthesize a natural-language answer** — while the dashed lines show how prior turns are loaded from and saved back to the checkpointer, enabling follow-ups like *"What did she do there?"* to resolve correctly against earlier context.
+
+---
+
 ## 🧪 Testing
 
 Run the full test suite (38 tests):

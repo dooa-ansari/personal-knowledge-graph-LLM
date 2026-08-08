@@ -1,6 +1,6 @@
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 from django.urls import reverse
@@ -22,7 +22,6 @@ from .services.rdf_converter import (
     convert_resume_to_rdf,
 )
 from .services.sparql_service import execute_sparql_query, _serialize_rdf_term
-from .prompts import NATURAL_LANGUAGE_SYSTEM_PROMPT, SPARQL_SYSTEM_PROMPT
 
 # Sample resume markdown content for testing
 SAMPLE_RESUME = """# **TEST USER**
@@ -380,30 +379,36 @@ class SparqlServiceTests(TestCase):
 
 
 class SearchKnowledgeGraphEndpointTests(TestCase):
-    """Tests for the search-knowledge-graph endpoint."""
+    """Tests for the search-knowledge-graph endpoint with LangGraph integration."""
 
     def setUp(self):
         self.client = APIClient()
         self.url = reverse("search_knowledge_graph")
 
-    @patch("resume_api.views.query_openrouter", side_effect=[
-        """PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }""",
-        "Your name is DOOA ANSARI.",
-    ])
-    @patch("resume_api.views.execute_sparql_query")
-    def test_post_search_success(self, mock_execute, mock_query):
+    @patch("resume_api.views.search_with_context")
+    def test_post_search_success(self, mock_search):
         """Test that POST /api/search-knowledge-graph/ returns 200 with natural language answer."""
-        # Mock SPARQL execution results
-        mock_execute.return_value = {
-            "columns": ["name"],
-            "rows": [{"name": "DOOA ANSARI"}],
-            "row_count": 1,
+        mock_search.return_value = {
+            "prompt": "What is my name?",
+            "session_id": "test-session-123",
+            "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "sparql_query": "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }",
+            "query_results": {
+                "columns": ["name"],
+                "rows": [{"name": "DOOA ANSARI"}],
+                "row_count": 1,
+            },
+            "answer": "Your name is DOOA ANSARI.",
         }
 
-        response = self.client.post(self.url, {"prompt": "What is my name?"}, format="json")
+        response = self.client.post(
+            self.url,
+            {"prompt": "What is my name?", "session_id": "test-session-123"},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["prompt"], "What is my name?")
+        self.assertEqual(response.data["session_id"], "test-session-123")
         self.assertEqual(response.data["model"], "nvidia/nemotron-3-ultra-550b-a55b:free")
         self.assertIn("sparql_query", response.data)
         self.assertIn("query_results", response.data)
@@ -411,24 +416,32 @@ SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }""",
         self.assertEqual(response.data["query_results"]["rows"][0]["name"], "DOOA ANSARI")
         self.assertEqual(response.data["answer"], "Your name is DOOA ANSARI.")
 
-        # Verify the service was called twice (SPARQL generation + natural language conversion)
-        self.assertEqual(mock_query.call_count, 2)
+        # Verify search_with_context was called with the correct arguments
+        mock_search.assert_called_once_with("test-session-123", "What is my name?")
 
-        # First call: SPARQL query generation with the user prompt
-        first_call = mock_query.call_args_list[0]
-        self.assertEqual(first_call[0][0], "What is my name?")
-        self.assertEqual(first_call[1]["model"], "nvidia/nemotron-3-ultra-550b-a55b:free")
-        self.assertEqual(first_call[1]["system_prompt"], SPARQL_SYSTEM_PROMPT)
+    @patch("resume_api.views.search_with_context")
+    def test_post_search_auto_generates_session_id(self, mock_search):
+        """Test that a session ID is auto-generated when not provided."""
+        mock_search.return_value = {
+            "prompt": "test",
+            "session_id": "auto-generated-id",
+            "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+            "sparql_query": "SELECT * WHERE { ?s ?p ?o }",
+            "query_results": {"columns": [], "rows": [], "row_count": 0},
+            "answer": "No results found.",
+        }
 
-        # Second call: natural language conversion with query results
-        second_call = mock_query.call_args_list[1]
-        self.assertIn("What is my name?", second_call[0][0])
-        self.assertIn("DOOA ANSARI", second_call[0][0])
-        self.assertEqual(second_call[1]["system_prompt"], NATURAL_LANGUAGE_SYSTEM_PROMPT)
-
-        # Verify the SPARQL query was executed
-        mock_execute.assert_called_once()
-        self.assertIn("PREFIX", mock_execute.call_args[0][0])
+        response = self.client.post(
+            self.url,
+            {"prompt": "test"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("session_id", response.data)
+        # Verify the auto-generated session ID was passed to search_with_context
+        mock_search.assert_called_once()
+        args = mock_search.call_args[0]
+        self.assertNotEqual(args[0], "")  # session_id should not be empty
 
     def test_post_search_missing_prompt(self):
         """Test that POST returns 400 when prompt is missing."""
@@ -443,27 +456,17 @@ SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }""",
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("error", response.data)
 
-    @patch("resume_api.views.query_openrouter", side_effect=ValueError("API key not configured"))
-    def test_post_search_missing_api_key(self, mock_query):
+    @patch("resume_api.views.search_with_context", side_effect=ValueError("API key not configured"))
+    def test_post_search_missing_api_key(self, mock_search):
         """Test that POST returns 500 when API key is not configured."""
         response = self.client.post(self.url, {"prompt": "test"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn("error", response.data)
         self.assertIn("API key not configured", response.data["error"])
 
-    @patch("resume_api.views.query_openrouter", side_effect=Exception("Network error"))
-    def test_post_search_api_error(self, mock_query):
-        """Test that POST returns 500 when OpenRouter API call fails."""
-        response = self.client.post(self.url, {"prompt": "test"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertIn("error", response.data)
-        self.assertIn("Failed to query knowledge graph", response.data["error"])
-
-    @patch("resume_api.views.query_openrouter", return_value="""PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }""")
-    @patch("resume_api.views.execute_sparql_query", side_effect=Exception("SPARQL error"))
-    def test_post_search_sparql_error(self, mock_execute, mock_query):
-        """Test that POST returns 500 when SPARQL execution fails."""
+    @patch("resume_api.views.search_with_context", side_effect=Exception("Network error"))
+    def test_post_search_api_error(self, mock_search):
+        """Test that POST returns 500 when the search service fails."""
         response = self.client.post(self.url, {"prompt": "test"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn("error", response.data)
@@ -473,6 +476,103 @@ SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }""")
         """Test that GET /api/search-knowledge-graph/ returns 405."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class LangGraphServiceTests(TestCase):
+    """Tests for the LangGraph conversational search service."""
+
+    @patch("resume_api.services.langgraph_service.settings.OPENROUTER_API_KEY", "")
+    def test_search_with_context_missing_api_key(self):
+        """Test that search_with_context raises ValueError when API key is missing."""
+        from .services.langgraph_service import search_with_context
+
+        with self.assertRaises(ValueError):
+            search_with_context("test-session", "test prompt")
+
+    @patch("resume_api.services.langgraph_service.settings.OPENROUTER_API_KEY", "test-key")
+    @patch("resume_api.services.langgraph_service._get_llm")
+    @patch("resume_api.services.langgraph_service.execute_sparql_query")
+    def test_search_with_context_success(self, mock_execute, mock_get_llm):
+        """Test that search_with_context runs the workflow and returns results."""
+        from .services.langgraph_service import search_with_context
+
+        # Mock the LLM responses
+        mock_llm = MagicMock()
+        mock_llm.invoke.side_effect = [
+            MagicMock(content="PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }"),
+            MagicMock(content="Your name is DOOA ANSARI."),
+        ]
+        mock_get_llm.return_value = mock_llm
+
+        # Mock SPARQL execution
+        mock_execute.return_value = {
+            "columns": ["name"],
+            "rows": [{"name": "DOOA ANSARI"}],
+            "row_count": 1,
+        }
+
+        result = search_with_context("test-session-1", "What is my name?")
+
+        self.assertEqual(result["prompt"], "What is my name?")
+        self.assertEqual(result["session_id"], "test-session-1")
+        self.assertEqual(result["model"], "nvidia/nemotron-3-ultra-550b-a55b:free")
+        self.assertIn("PREFIX", result["sparql_query"])
+        self.assertEqual(result["query_results"]["row_count"], 1)
+        self.assertEqual(result["answer"], "Your name is DOOA ANSARI.")
+
+        # Verify the LLM was called twice (SPARQL generation + answer generation)
+        self.assertEqual(mock_llm.invoke.call_count, 2)
+
+        # Verify SPARQL execution was called
+        mock_execute.assert_called_once()
+
+    @patch("resume_api.services.langgraph_service.settings.OPENROUTER_API_KEY", "test-key")
+    @patch("resume_api.services.langgraph_service._get_llm")
+    @patch("resume_api.services.langgraph_service.execute_sparql_query")
+    def test_search_with_context_conversation_history(self, mock_execute, mock_get_llm):
+        """Test that conversation context is maintained across multiple calls."""
+        from .services.langgraph_service import search_with_context
+
+        # Mock the LLM responses for two turns
+        mock_llm = MagicMock()
+        mock_llm.invoke.side_effect = [
+            # First turn: SPARQL generation + answer generation
+            MagicMock(content="PREFIX resume: <http://example.org/resume#> SELECT ?company WHERE { ?exp resume:company ?company }"),
+            MagicMock(content="Dooa worked at Greator GmbH."),
+            # Second turn: SPARQL generation + answer generation (with context)
+            MagicMock(content="PREFIX resume: <http://example.org/resume#> SELECT ?role WHERE { ?exp resume:company \"Greator GmbH\" . ?exp resume:role ?role }"),
+            MagicMock(content="She was a Frontend Developer there."),
+        ]
+        mock_get_llm.return_value = mock_llm
+
+        mock_execute.return_value = {
+            "columns": ["company"],
+            "rows": [{"company": "Greator GmbH"}],
+            "row_count": 1,
+        }
+
+        # First question
+        result1 = search_with_context("conversation-1", "When did Dooa work at Greator?")
+        self.assertEqual(result1["answer"], "Dooa worked at Greator GmbH.")
+
+        # Second question (follow-up referencing "she" and "there")
+        result2 = search_with_context("conversation-1", "What did she do there?")
+        self.assertEqual(result2["answer"], "She was a Frontend Developer there.")
+
+        # Verify the LLM was called 4 times total (2 per turn)
+        self.assertEqual(mock_llm.invoke.call_count, 4)
+
+        # Verify that the second SPARQL generation call included conversation history
+        # The second call to invoke (index 2) should have more messages than the first (index 0)
+        first_sparql_call_messages = mock_llm.invoke.call_args_list[0][0][0]
+        second_sparql_call_messages = mock_llm.invoke.call_args_list[2][0][0]
+
+        # The second call should have more messages (system + history + new question)
+        # vs the first call (system + first question)
+        self.assertGreater(
+            len(second_sparql_call_messages),
+            len(first_sparql_call_messages),
+        )
 
 
 class SwaggerEndpointTests(TestCase):

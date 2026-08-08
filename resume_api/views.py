@@ -1,3 +1,4 @@
+import uuid
 from pathlib import Path
 
 from drf_yasg import openapi
@@ -5,15 +6,9 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .prompts import (
-    NATURAL_LANGUAGE_SYSTEM_PROMPT,
-    SPARQL_SYSTEM_PROMPT,
-    build_results_prompt,
-)
 from .serializers import PromptSerializer
-from .services.openrouter_service import query_openrouter
+from .services.langgraph_service import search_with_context
 from .services.rdf_converter import convert_resume_to_rdf
-from .services.sparql_service import execute_sparql_query
 
 # Swagger response schema
 success_response = openapi.Response(
@@ -44,6 +39,7 @@ search_success_response = openapi.Response(
         type=openapi.TYPE_OBJECT,
         properties={
             "prompt": openapi.Schema(type=openapi.TYPE_STRING, description="The user prompt"),
+            "session_id": openapi.Schema(type=openapi.TYPE_STRING, description="The session ID for conversation context"),
             "model": openapi.Schema(type=openapi.TYPE_STRING, description="The model used"),
             "sparql_query": openapi.Schema(type=openapi.TYPE_STRING, description="The generated SPARQL query"),
             "query_results": openapi.Schema(
@@ -113,8 +109,8 @@ def convert_resume(request):
 
 @swagger_auto_schema(
     method="post",
-    operation_description="Takes a user prompt, generates a SPARQL query via OpenRouter, executes it against the knowledge graph, and converts results to natural language.",
-    operation_summary="Search knowledge graph with AI and get natural language answer",
+    operation_description="Takes a user prompt, generates a SPARQL query via LangGraph/OpenRouter, executes it against the knowledge graph, and converts results to natural language. Conversation context is maintained across requests using a session ID.",
+    operation_summary="Search knowledge graph with AI and conversation context",
     request_body=PromptSerializer,
     responses={
         200: search_success_response,
@@ -126,13 +122,18 @@ def convert_resume(request):
 def search_knowledge_graph(request):
     """
     Endpoint that:
-    1. Takes a user prompt
-    2. Uses OpenRouter to convert it into a SPARQL query
-    3. Executes the SPARQL query against the RDF knowledge graph
-    4. Sends the query results back to OpenRouter to convert into natural language
-    5. Returns the natural language answer
+    1. Takes a user prompt and optional session ID
+    2. Uses LangGraph to maintain conversation context
+    3. Generates a SPARQL query from the prompt (with conversation history)
+    4. Executes the SPARQL query against the RDF knowledge graph
+    5. Converts the query results into natural language (with conversation history)
+    6. Returns the natural language answer
+
+    If no session_id is provided, a new one is generated and returned so the
+    client can reuse it for follow-up questions.
     """
     prompt = request.data.get("prompt", "").strip()
+    session_id = request.data.get("session_id", "").strip()
 
     if not prompt:
         return Response(
@@ -140,37 +141,13 @@ def search_knowledge_graph(request):
             status=400,
         )
 
+    # Generate a new session ID if none was provided
+    if not session_id:
+        session_id = str(uuid.uuid4())
+
     try:
-        model = "nvidia/nemotron-3-ultra-550b-a55b:free"
-
-        # Step 1: Generate SPARQL query from the user prompt
-        sparql_query = query_openrouter(
-            prompt,
-            model=model,
-            system_prompt=SPARQL_SYSTEM_PROMPT,
-        )
-
-        # Step 2: Execute the SPARQL query against the RDF knowledge graph
-        query_results = execute_sparql_query(sparql_query)
-
-        # Step 3: Convert the query results into natural language
-        results_prompt = build_results_prompt(prompt, query_results)
-        natural_language_answer = query_openrouter(
-            results_prompt,
-            model=model,
-            system_prompt=NATURAL_LANGUAGE_SYSTEM_PROMPT,
-        )
-
-        return Response(
-            {
-                "prompt": prompt,
-                "model": model,
-                "sparql_query": sparql_query,
-                "query_results": query_results,
-                "answer": natural_language_answer,
-            },
-            status=200,
-        )
+        result = search_with_context(session_id, prompt)
+        return Response(result, status=200)
     except ValueError as e:
         return Response(
             {"error": str(e)},

@@ -8,3 +8,8 @@ class PromptSerializer(serializers.Serializer):
         help_text="User prompt to search the knowledge graph",
         required=True,
     )
+    session_id = serializers.CharField(
+        help_text="Session ID for conversation context. If omitted, a new session is created.",
+        required=False,
+        allow_blank=True,
+    )
