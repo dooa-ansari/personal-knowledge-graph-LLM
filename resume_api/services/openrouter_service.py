@@ -5,10 +5,12 @@ OpenRouter API service for interacting with language models.
 import requests
 from django.conf import settings
 
+from .model_config import DEFAULT_MODEL
+
 
 def query_openrouter(
     prompt: str,
-    model: str = "poolside/laguna-xs-2.1:free",
+    model: str = DEFAULT_MODEL,
     system_prompt: str = None,
 ) -> str:
     """
@@ -16,7 +18,7 @@ def query_openrouter(
 
     Args:
         prompt: The user prompt to send to the model
-        model: The model identifier to use (defaults to poolside/laguna-xs-2.1:free)
+        model: The model identifier to use (defaults to the central DEFAULT_MODEL)
         system_prompt: An optional system prompt to instruct the model's behavior
 
     Returns:

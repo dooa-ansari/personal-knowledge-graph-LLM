@@ -42,6 +42,16 @@ Instructions:
 3. Use PREFIX declarations for foaf, schema, resume, and rdf.
 4. Return ONLY the SPARQL query, without any additional text, explanation, or markdown code fences.
 5. If the question cannot be translated to SPARQL, return a comment: # Unable to generate SPARQL query for this question.
+
+IMPORTANT — Use fuzzy string matching:
+- When filtering on text fields (company, role, location, institution, name, etc.), use CONTAINS(LCASE(STR(?field)), "search term") instead of exact equality.
+- For example, to search for "Greator" in company names, use: FILTER(CONTAINS(LCASE(STR(?company)), "greator"))
+- To search for a person's name, use: FILTER(CONTAINS(LCASE(STR(?name)), "dooa"))
+- This ensures that partial matches work (e.g., "Greator" matches "Greator GmbH").
+- The person node can be identified by the type foaf:Person or schema:Person.
+- The person's name is stored under foaf:name.
+- Always use LCASE and STR inside CONTAINS for case-insensitive matching.
+- Do NOT use FILTER(LCASE(STR(?x)) = "exact") — always use CONTAINS instead.
 """
 
 NATURAL_LANGUAGE_SYSTEM_PROMPT = """

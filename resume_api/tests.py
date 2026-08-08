@@ -268,7 +268,7 @@ class OpenRouterServiceTests(TestCase):
         call_args = mock_post.call_args
         self.assertEqual(call_args[0][0], "https://openrouter.ai/api/v1/chat/completions")
         self.assertEqual(call_args[1]["headers"]["Authorization"], "Bearer test-key")
-        self.assertEqual(call_args[1]["json"]["model"], "poolside/laguna-xs-2.1:free")
+        self.assertEqual(call_args[1]["json"]["model"], "openai/gpt-oss-20b:free")
         self.assertEqual(call_args[1]["json"]["messages"][0]["content"], "test prompt")
 
     @patch("resume_api.services.openrouter_service.settings.OPENROUTER_API_KEY", "test-key")
@@ -391,7 +391,7 @@ class SearchKnowledgeGraphEndpointTests(TestCase):
         mock_search.return_value = {
             "prompt": "What is my name?",
             "session_id": "test-session-123",
-            "model": "poolside/laguna-xs-2.1:free",
+            "model": "openai/gpt-oss-20b:free",
             "sparql_query": "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }",
             "query_results": {
                 "columns": ["name"],
@@ -409,7 +409,7 @@ class SearchKnowledgeGraphEndpointTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["prompt"], "What is my name?")
         self.assertEqual(response.data["session_id"], "test-session-123")
-        self.assertEqual(response.data["model"], "poolside/laguna-xs-2.1:free")
+        self.assertEqual(response.data["model"], "openai/gpt-oss-20b:free")
         self.assertIn("sparql_query", response.data)
         self.assertIn("query_results", response.data)
         self.assertEqual(response.data["query_results"]["row_count"], 1)
@@ -425,7 +425,7 @@ class SearchKnowledgeGraphEndpointTests(TestCase):
         mock_search.return_value = {
             "prompt": "test",
             "session_id": "auto-generated-id",
-            "model": "poolside/laguna-xs-2.1:free",
+            "model": "openai/gpt-oss-20b:free",
             "sparql_query": "SELECT * WHERE { ?s ?p ?o }",
             "query_results": {"columns": [], "rows": [], "row_count": 0},
             "answer": "No results found.",
@@ -515,7 +515,7 @@ class LangGraphServiceTests(TestCase):
 
         self.assertEqual(result["prompt"], "What is my name?")
         self.assertEqual(result["session_id"], "test-session-1")
-        self.assertEqual(result["model"], "poolside/laguna-xs-2.1:free")
+        self.assertEqual(result["model"], "openai/gpt-oss-20b:free")
         self.assertIn("PREFIX", result["sparql_query"])
         self.assertEqual(result["query_results"]["row_count"], 1)
         self.assertEqual(result["answer"], "Your name is DOOA ANSARI.")
@@ -573,6 +573,147 @@ class LangGraphServiceTests(TestCase):
             len(second_sparql_call_messages),
             len(first_sparql_call_messages),
         )
+
+
+class SimpleSearchServiceTests(TestCase):
+    """Tests for the stateless one-shot knowledge graph search service."""
+
+    @patch("resume_api.services.simple_search_service.settings.OPENROUTER_API_KEY", "")
+    def test_search_simple_missing_api_key(self):
+        """Test that search_simple raises ValueError when API key is missing."""
+        from .services.simple_search_service import search_simple
+
+        with self.assertRaises(ValueError):
+            search_simple("test prompt")
+
+    @patch("resume_api.services.simple_search_service.settings.OPENROUTER_API_KEY", "test-key")
+    @patch("resume_api.services.simple_search_service.query_openrouter")
+    @patch("resume_api.services.simple_search_service.execute_sparql_query")
+    def test_search_simple_success(self, mock_execute, mock_query):
+        """Test that search_simple runs the full flow and returns results."""
+        from .services.simple_search_service import search_simple
+
+        # Mock the two LLM calls (SPARQL generation + answer generation)
+        mock_query.side_effect = [
+            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }",
+            "Your name is DOOA ANSARI.",
+        ]
+
+        # Mock SPARQL execution
+        mock_execute.return_value = {
+            "columns": ["name"],
+            "rows": [{"name": "DOOA ANSARI"}],
+            "row_count": 1,
+        }
+
+        result = search_simple("What is my name?")
+
+        self.assertEqual(result["prompt"], "What is my name?")
+        self.assertEqual(result["model"], "openai/gpt-oss-20b:free")
+        self.assertIn("PREFIX", result["sparql_query"])
+        self.assertEqual(result["query_results"]["row_count"], 1)
+        self.assertEqual(result["answer"], "Your name is DOOA ANSARI.")
+
+        # Verify query_openrouter was called twice (SPARQL generation + answer generation)
+        self.assertEqual(mock_query.call_count, 2)
+
+        # Verify SPARQL execution was called
+        mock_execute.assert_called_once()
+
+    @patch("resume_api.services.simple_search_service.settings.OPENROUTER_API_KEY", "test-key")
+    @patch("resume_api.services.simple_search_service.query_openrouter")
+    @patch("resume_api.services.simple_search_service.execute_sparql_query")
+    def test_search_simple_no_session_id_in_result(self, mock_execute, mock_query):
+        """Test that the simple search result contains no session_id field."""
+        from .services.simple_search_service import search_simple
+
+        mock_query.side_effect = [
+            "SELECT * WHERE { ?s ?p ?o }",
+            "No results found.",
+        ]
+        mock_execute.return_value = {
+            "columns": [],
+            "rows": [],
+            "row_count": 0,
+        }
+
+        result = search_simple("test")
+
+        self.assertNotIn("session_id", result)
+
+
+class SimpleSearchEndpointTests(TestCase):
+    """Tests for the stateless search-knowledge-graph-simple endpoint."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse("search_knowledge_graph_simple")
+
+    @patch("resume_api.views.search_simple")
+    def test_post_search_simple_success(self, mock_search):
+        """Test that POST /api/search-knowledge-graph-simple/ returns 200 with natural language answer."""
+        mock_search.return_value = {
+            "prompt": "What is my name?",
+            "model": "openai/gpt-oss-20b:free",
+            "sparql_query": "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?person a foaf:Person . ?person foaf:name ?name }",
+            "query_results": {
+                "columns": ["name"],
+                "rows": [{"name": "DOOA ANSARI"}],
+                "row_count": 1,
+            },
+            "answer": "Your name is DOOA ANSARI.",
+        }
+
+        response = self.client.post(
+            self.url,
+            {"prompt": "What is my name?"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["prompt"], "What is my name?")
+        self.assertEqual(response.data["model"], "openai/gpt-oss-20b:free")
+        self.assertIn("sparql_query", response.data)
+        self.assertIn("query_results", response.data)
+        self.assertEqual(response.data["query_results"]["row_count"], 1)
+        self.assertEqual(response.data["answer"], "Your name is DOOA ANSARI.")
+        self.assertNotIn("session_id", response.data)
+
+        # Verify search_knowledge_graph_simple was called with the prompt only
+        mock_search.assert_called_once_with("What is my name?")
+
+    def test_post_search_simple_missing_prompt(self):
+        """Test that POST returns 400 when prompt is missing."""
+        response = self.client.post(self.url, {}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data)
+        self.assertIn("Prompt is required", response.data["error"])
+
+    def test_post_search_simple_empty_prompt(self):
+        """Test that POST returns 400 when prompt is empty."""
+        response = self.client.post(self.url, {"prompt": "   "}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("error", response.data)
+
+    @patch("resume_api.views.search_simple", side_effect=ValueError("API key not configured"))
+    def test_post_search_simple_missing_api_key(self, mock_search):
+        """Test that POST returns 500 when API key is not configured."""
+        response = self.client.post(self.url, {"prompt": "test"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("error", response.data)
+        self.assertIn("API key not configured", response.data["error"])
+
+    @patch("resume_api.views.search_simple", side_effect=Exception("Network error"))
+    def test_post_search_simple_api_error(self, mock_search):
+        """Test that POST returns 500 when the search service fails."""
+        response = self.client.post(self.url, {"prompt": "test"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("error", response.data)
+        self.assertIn("Failed to query knowledge graph", response.data["error"])
+
+    def test_get_method_not_allowed(self):
+        """Test that GET /api/search-knowledge-graph-simple/ returns 405."""
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class SwaggerEndpointTests(TestCase):

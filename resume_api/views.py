@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from .serializers import PromptSerializer
 from .services.langgraph_service import search_with_context
 from .services.rdf_converter import convert_resume_to_rdf
+from .services.simple_search_service import search_simple
 
 # Swagger response schema
 success_response = openapi.Response(
@@ -148,6 +149,58 @@ def search_knowledge_graph(request):
 
     try:
         result = search_with_context(session_id, prompt)
+        return Response(result, status=200)
+    except ValueError as e:
+        return Response(
+            {"error": str(e)},
+            status=500,
+        )
+    except FileNotFoundError as e:
+        return Response(
+            {"error": str(e)},
+            status=500,
+        )
+    except Exception as e:
+        return Response(
+            {"error": f"Failed to query knowledge graph: {str(e)}"},
+            status=500,
+        )
+
+
+@swagger_auto_schema(
+    method="post",
+    operation_description="Takes a user prompt, generates a SPARQL query via OpenRouter, executes it against the knowledge graph, and converts results to natural language. This is a stateless, one-shot search with no conversation context or session tracking.",
+    operation_summary="Search knowledge graph with AI (single question, no session)",
+    request_body=PromptSerializer,
+    responses={
+        200: search_success_response,
+        400: error_response,
+        500: error_response,
+    },
+)
+@api_view(["POST"])
+def search_knowledge_graph_simple(request):
+    """
+    Endpoint that:
+    1. Takes a user prompt
+    2. Generates a SPARQL query from the prompt (via OpenRouter)
+    3. Executes the SPARQL query against the RDF knowledge graph
+    4. Converts the query results into natural language (via OpenRouter)
+    5. Returns the natural language answer
+
+    This is a stateless, one-shot search — no session ID, no conversation
+    context, and no persisted state. Each request is independent.
+    """
+    prompt = request.data.get("prompt", "").strip()
+
+    if not prompt:
+        return Response(
+            {"error": "Prompt is required."},
+            status=400,
+        )
+
+    try:
+        result = search_simple(prompt)
         return Response(result, status=200)
     except ValueError as e:
         return Response(

@@ -21,10 +21,8 @@ from ..prompts import (
     SPARQL_SYSTEM_PROMPT,
     build_results_prompt,
 )
+from .model_config import DEFAULT_MODEL
 from .sparql_service import execute_sparql_query
-
-# The default model used for LLM calls
-DEFAULT_MODEL = "poolside/laguna-xs-2.1:free"
 
 
 def _get_llm() -> ChatOpenAI:

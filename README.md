@@ -1,6 +1,6 @@
 # Django RDF Semantic Resume Agent 🧠🕸️
 
-A lightweight, production-grade Django service that combines **RDF/Turtle (.ttl)** data modeling, local **SPARQL** querying via `rdflib`, and advanced LLM reasoning through **OpenRouter** (powered by Poolside Laguna XS 2.1).
+A lightweight, production-grade Django service that combines **RDF/Turtle (.ttl)** data modeling, local **SPARQL** querying via `rdflib`, and advanced LLM reasoning through **OpenRouter** (powered by OpenAI GPT-OSS-20B).
 
 Instead of dumping raw documents or bloated text chunks into an LLM context window, this project implements a precise **GraphRAG-lite** pattern: translating natural language questions into deterministic SPARQL graph queries to eliminate hallucinations and extract exact background data.
 
@@ -20,7 +20,7 @@ Instead of dumping raw documents or bloated text chunks into an LLM context wind
 * **Backend:** Python, Django 5.2 (LTS)
 * **Semantic Graph Engine:** `rdflib` 7.1 (RDF parsing and SPARQL 1.1 engine)
 * **LLM Orchestration:** OpenAI-compatible API via OpenRouter (`requests` library)
-* **AI Model:** Poolside Laguna XS 2.1 via OpenRouter (`poolside/laguna-xs-2.1:free`)
+* **AI Model:** OpenAI GPT-OSS-20B via OpenRouter (`openai/gpt-oss-20b:free`) — configured centrally in `resume_api/services/model_config.py`
 * **API Documentation:** Swagger / OpenAPI via `drf-yasg`
 * **Environment Management:** `python-dotenv`
 
@@ -49,11 +49,14 @@ personal-knowledge-graph/
     ├── views.py               # API endpoints + system prompts
     ├── urls.py                # API URL routing
     ├── serializers.py         # DRF serializers for Swagger
-    ├── tests.py               # 38 unit tests
+    ├── tests.py               # 50 unit tests
     └── services/
         ├── rdf_converter.py   # Resume markdown → RDF converter
         ├── openrouter_service.py  # OpenRouter LLM client
-        └── sparql_service.py  # SPARQL query execution engine
+        ├── sparql_service.py  # SPARQL query execution engine
+        ├── langgraph_service.py   # LangGraph conversational search
+        ├── simple_search_service.py  # Stateless one-shot search
+        └── model_config.py    # Central model configuration (single source of truth)
 ```
 
 ---
@@ -113,7 +116,7 @@ curl -X POST http://127.0.0.1:8000/api/convert-resume/
 
 This reads `All Details Resume.md`, converts it to RDF, and writes `All Details Resume.ttl` in the same directory.
 
-### Search the knowledge graph
+### Search the knowledge graph (with conversation context)
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph/ \
@@ -125,7 +128,7 @@ curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph/ \
 ```json
 {
   "prompt": "What companies has the candidate worked at?",
-  "model": "poolside/laguna-xs-2.1:free",
+  "model": "openai/gpt-oss-20b:free",
   "sparql_query": "PREFIX resume: <http://example.org/resume#> SELECT ?company WHERE { ... }",
   "query_results": {
     "columns": ["company"],
@@ -143,6 +146,40 @@ curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph/ \
 }
 ```
 
+### Search the knowledge graph (stateless, one-shot)
+
+For a single question/answer with no conversation context or session tracking:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph-simple/ \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "What companies has the candidate worked at?"}'
+```
+
+**Example response:**
+```json
+{
+  "prompt": "What companies has the candidate worked at?",
+  "model": "openai/gpt-oss-20b:free",
+  "sparql_query": "PREFIX resume: <http://example.org/resume#> SELECT ?company WHERE { ... }",
+  "query_results": {
+    "columns": ["company"],
+    "rows": [
+      {"company": "DeepSkill GmbH"},
+      {"company": "Greator GmbH"},
+      {"company": "Mindshine GmbH"},
+      {"company": "VentureDive"},
+      {"company": "Centegy Technologies"},
+      {"company": "Digital Dividend"}
+    ],
+    "row_count": 6
+  },
+  "answer": "The candidate has worked at 6 companies: DeepSkill GmbH, Greator GmbH, Mindshine GmbH, VentureDive, Centegy Technologies, and Digital Dividend."
+}
+```
+
+> **Note:** The simple endpoint returns no `session_id` — each request is fully independent.
+
 ---
 
 ## 📡 API Endpoints
@@ -150,7 +187,8 @@ curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph/ \
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/convert-resume/` | Convert resume markdown to RDF (.ttl) |
-| `POST` | `/api/search-knowledge-graph/` | Search knowledge graph with AI (natural language → SPARQL → results → natural language) |
+| `POST` | `/api/search-knowledge-graph/` | Search knowledge graph with AI + conversation context (LangGraph, session-based) |
+| `POST` | `/api/search-knowledge-graph-simple/` | Search knowledge graph with AI (stateless, one-shot, no session) |
 | `GET` | `/swagger/` | Swagger UI (interactive API documentation) |
 | `GET` | `/redoc/` | ReDoc UI (alternative API documentation) |
 | `GET` | `/swagger.json` | Swagger JSON schema |
@@ -163,9 +201,9 @@ curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph/ \
 
 ```mermaid
 flowchart TD
-    A[User Prompt] --> B["Step 1: SPARQL Generation<br/>OpenRouter (Poolside Laguna XS 2.1)<br/>with SPARQL_SYSTEM_PROMPT"]
+    A[User Prompt] --> B["Step 1: SPARQL Generation<br/>OpenRouter (OpenAI GPT-OSS-20B)<br/>with SPARQL_SYSTEM_PROMPT"]
     B --> C["Step 2: SPARQL Execution<br/>rdflib (local, deterministic)<br/>against All Details Resume.ttl"]
-    C --> D["Step 3: Natural Language Synthesis<br/>OpenRouter (Poolside Laguna XS 2.1)<br/>with NATURAL_LANGUAGE_SYSTEM_PROMPT"]
+    C --> D["Step 3: Natural Language Synthesis<br/>OpenRouter (OpenAI GPT-OSS-20B)<br/>with NATURAL_LANGUAGE_SYSTEM_PROMPT"]
     D --> E[API Response]
 
     style A fill:#4CAF50,color:#fff
@@ -213,7 +251,7 @@ This means every user turn always flows through the same pipeline: **translate c
 
 ## 🧪 Testing
 
-Run the full test suite (38 tests):
+Run the full test suite (50 tests):
 
 ```bash
 python3 manage.py test resume_api -v 2
@@ -228,6 +266,9 @@ python3 manage.py test resume_api -v 2
 | `OpenRouterServiceTests` | 4 | OpenRouter API client |
 | `SparqlServiceTests` | 6 | SPARQL execution engine |
 | `SearchKnowledgeGraphEndpointTests` | 7 | Search endpoint (success, errors, method validation) |
+| `LangGraphServiceTests` | 3 | LangGraph conversational search service |
+| `SimpleSearchServiceTests` | 3 | Stateless one-shot search service |
+| `SimpleSearchEndpointTests` | 6 | Stateless search endpoint |
 | `SwaggerEndpointTests` | 4 | Swagger/ReDoc documentation |
 
 ---
