@@ -27,6 +27,23 @@ SECTION_HEADERS = [
     "PROJECTS",
 ]
 
+# The compact skills cell does not put a delimiter between every category and
+# the preceding skill.  Keep the labels explicit so the parser never mistakes
+# a skill such as "App Store" for the beginning of a category.
+SKILL_CATEGORY_NAMES = [
+    "Core Languages",
+    "Frontend Frameworks & Design",
+    "Mobile Development",
+    "Backend Frameworks & Architectures",
+    "Databases",
+    "Testing & Quality Assurance",
+    "DevOps, Cloud & Infrastructure",
+    "AI Tools",
+    "Methodologies & Teamwork",
+    # Retained for the small fixture used by the converter tests.
+    "Frontend",
+]
+
 
 def _clean_text(text: str) -> str:
     """Clean and normalize text extracted from markdown."""
@@ -155,42 +172,55 @@ def _parse_professional_experience(content: str) -> list[dict]:
 
 
 def _parse_skills(content: str) -> list[dict]:
-    """Parse the skills section."""
+    """Parse the known, delimiter-free skill categories in the compact table."""
+    markers = []
+    for category in SKILL_CATEGORY_NAMES:
+        match = re.search(rf"(?<!\w){re.escape(category)}\s*:", content)
+        if match:
+            markers.append((match.start(), match.end(), category))
+
+    markers.sort()
     skills = []
-    # Skills are formatted as: "Category:  item1, item2, item3"
-    pattern = re.compile(r"([A-Z][^:]+):\s*([^|]+)")
-    for match in pattern.finditer(content):
-        category = _clean_text(match.group(1))
-        items_text = _clean_text(match.group(2))
-        items = [item.strip() for item in items_text.split(",") if item.strip()]
-        skills.append({"category": category, "items": items})
+    for index, (_, end, category) in enumerate(markers):
+        next_start = markers[index + 1][0] if index + 1 < len(markers) else len(content)
+        items = [
+            _clean_text(item)
+            for item in content[end:next_start].split(",")
+            if _clean_text(item)
+        ]
+        if items:
+            skills.append({"category": category, "items": items})
     return skills
 
 
 def _parse_education(content: str) -> list[dict]:
-    """Parse the education section."""
+    """Parse consecutive ``institution *dates* degree`` education entries."""
     education = []
-    # Education entries: "University *dates, location* Degree"
     pattern = re.compile(
-        r"([A-Z][A-Za-z\s&]+?)\s*\*([^*]+?)\*\s*([A-Z][A-Za-z\s]+)"
+        r"(?P<institution>[A-Z][A-Za-z\s&äöüÄÖÜ-]+?)\s*"
+        r"\*(?P<dates>[^*]+)\*\s*"
+        r"(?P<degree>(?:Bachelor(?:'s)?|Master|Doctor)(?:\s+[A-Za-z]+)+?)"
+        r"(?=\s{2,}[A-Z][A-Za-z\s&äöüÄÖÜ-]+?\s*\*|\s*$)"
     )
     for match in pattern.finditer(content):
         education.append({
-            "institution": _clean_text(match.group(1)),
-            "dates": _clean_text(match.group(2)),
-            "degree": _clean_text(match.group(3)),
+            "institution": _clean_text(match.group("institution")),
+            "dates": _clean_text(match.group("dates")),
+            "degree": _clean_text(match.group("degree")),
         })
     return education
 
 
 def _parse_languages(content: str) -> list[dict]:
-    """Parse the languages section."""
+    """Parse multiple ``Language \\- proficiency`` values from one table cell."""
     languages = []
-    # Languages: "English \- Full Professional Proficiency (C1)"
-    pattern = re.compile(r"([A-Za-z]+)\s*\\?-\s*([^*|]+)")
+    pattern = re.compile(
+        r"(?P<language>[A-Za-z]+)\s*\\-\s*(?P<proficiency>.*?)"
+        r"(?=\s+[A-Z][a-z]+\s*\\-|$)"
+    )
     for match in pattern.finditer(content):
-        lang = _clean_text(match.group(1))
-        proficiency = _clean_text(match.group(2))
+        lang = _clean_text(match.group("language"))
+        proficiency = _clean_text(match.group("proficiency"))
         if lang and proficiency:
             languages.append({"language": lang, "proficiency": proficiency})
     return languages
@@ -217,21 +247,21 @@ def _parse_academic_experience(content: str) -> list[dict]:
             "outcome": "",
             "link": "",
         }
-        # Extract details from entry text
+        # Extract details from entry text.  The source uses both Markdown links
+        # and plain text, so normalize formatting before classifying each line.
         for line in entry_text.split("\n"):
-            line = line.strip()
-            if line.startswith("*"):
-                bullet = line.lstrip("*").strip()
-                if bullet.startswith("Technology stack") or bullet.startswith("Technology Stack"):
-                    entry["stack"] = bullet
-                elif bullet.startswith("The thesis") or bullet.startswith("The team"):
-                    entry["outcome"] = bullet
-                elif bullet.startswith("Deployment"):
-                    entry["outcome"] = f"{entry['outcome']} {bullet}".strip()
-                elif bullet.startswith("http"):
-                    entry["link"] = bullet
-            elif line.startswith("**Challenge:**") or line.startswith("Challenge:"):
-                entry["challenge"] = line.split(":", 1)[1].strip()
+            line = line.strip().lstrip("*").strip()
+            plain_line = line.replace("**", "")
+            if plain_line.startswith("Challenge:"):
+                entry["challenge"] = plain_line.split(":", 1)[1].strip()
+            elif plain_line.startswith(("Technology stack", "Technology Stack")):
+                entry["stack"] = plain_line
+            elif plain_line.startswith(("The thesis", "The team", "Deployment")):
+                entry["outcome"] = f"{entry['outcome']} {plain_line}".strip()
+
+            link_match = re.search(r"\((https?://[^)]+)\)|\[(https?://[^\]]+)", plain_line)
+            if link_match:
+                entry["link"] = link_match.group(1) or link_match.group(2)
         entries.append(entry)
     return entries
 
@@ -239,13 +269,16 @@ def _parse_academic_experience(content: str) -> list[dict]:
 def _parse_skill_details(content: str) -> list[dict]:
     """Parse skill detail sections like '**React Native \-**' or '**React Native** \-'."""
     skills = []
-    # Match: "**Skill Name \-**" (dash inside markers) or "**Skill Name** \-" (dash outside)
-    pattern = re.compile(r"\*\*(.+?)\s*\\-\*\*\s*([^*]+)")
-    for match in pattern.finditer(content):
-        name = _clean_text(match.group(1))
-        items_text = _clean_text(match.group(2))
-        items = [item.strip() for item in items_text.split(",") if item.strip()]
-        skills.append({"name": name, "items": items})
+    for line in content.splitlines():
+        line = line.strip()
+        match = re.match(r"\*\*(.+?)\s*\\-\*\*\s*(.+)$", line)
+        if not match:
+            match = re.match(r"\*\*(.+?)\*\*\s*\\-\s*(.+)$", line)
+        if match:
+            name = _clean_text(match.group(1))
+            items = [_clean_text(item) for item in match.group(2).split(",") if _clean_text(item)]
+            if name and items:
+                skills.append({"name": name, "items": items})
     return skills
 
 
@@ -254,8 +287,12 @@ def _parse_projects(content: str) -> list[str]:
     projects = []
     for line in content.split("\n"):
         line = line.strip()
-        if line and not line.startswith("#"):
-            projects.append(_clean_text(line))
+        if line and not line.startswith(("#", "**")):
+            projects.extend(
+                _clean_text(project)
+                for project in line.split(",")
+                if _clean_text(project)
+            )
     return projects
 
 

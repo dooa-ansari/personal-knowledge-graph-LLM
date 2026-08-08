@@ -4,7 +4,8 @@ from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 from django.urls import reverse
-from rdflib import Graph
+from rdflib import Graph, Namespace
+from rdflib.namespace import RDF
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -181,6 +182,49 @@ class RDFConverterServiceTests(TestCase):
         """Test that convert_resume_to_rdf raises FileNotFoundError for missing file."""
         with self.assertRaises(FileNotFoundError):
             convert_resume_to_rdf("/nonexistent/path/resume.md")
+
+    def test_real_resume_preserves_all_structured_sections(self):
+        """Protect against silently merging or dropping data in the real resume."""
+        source_path = Path(__file__).resolve().parent.parent / "All Details Resume.md"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            md_path = Path(tmpdir) / "resume.md"
+            md_path.write_text(source_path.read_text(encoding="utf-8"), encoding="utf-8")
+            rdf_path = convert_resume_to_rdf(str(md_path))
+
+            graph = Graph().parse(rdf_path, format="turtle")
+            resume = Namespace("http://example.org/resume#")
+            schema = Namespace("https://schema.org/")
+
+            self.assertEqual(len(set(graph.subjects(RDF.type, resume.Education))), 3)
+            self.assertEqual(len(set(graph.subjects(RDF.type, resume.Language))), 2)
+            self.assertEqual(len(set(graph.subjects(RDF.type, resume.SkillCategory))), 9)
+            self.assertEqual(len(set(graph.subjects(RDF.type, resume.SkillDetail))), 18)
+            self.assertEqual(len(set(graph.subjects(RDF.type, resume.Project))), 10)
+
+            education = {
+                (str(graph.value(node, resume.institution)), str(graph.value(node, schema.educationalCredentialAwarded)))
+                for node in graph.subjects(RDF.type, resume.Education)
+            }
+            self.assertIn(
+                ("Technische Universität Chemnitz", "Master of Science in Web Engineering"),
+                education,
+            )
+            self.assertIn(
+                ("Sir Syed University of Engineering and Technology", "Bachelor's in Computer Engineering"),
+                education,
+            )
+
+            languages = {
+                (str(graph.value(node, resume.language)), str(graph.value(node, resume.proficiency)))
+                for node in graph.subjects(RDF.type, resume.Language)
+            }
+            self.assertEqual(
+                languages,
+                {
+                    ("English", "Full Professional Proficiency (C1)"),
+                    ("German", "Beginner (A2)"),
+                },
+            )
 
 
 class ResumeApiEndpointTests(TestCase):

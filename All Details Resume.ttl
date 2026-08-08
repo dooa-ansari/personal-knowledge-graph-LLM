@@ -10,8 +10,10 @@
         <https://example.org/resume/dooa-ansari/academic/1>,
         <https://example.org/resume/dooa-ansari/academic/2> ;
     resume:hasEducation <https://example.org/resume/dooa-ansari/education/0>,
-        <https://example.org/resume/dooa-ansari/education/1> ;
-    resume:hasLanguage <https://example.org/resume/dooa-ansari/language/0> ;
+        <https://example.org/resume/dooa-ansari/education/1>,
+        <https://example.org/resume/dooa-ansari/education/2> ;
+    resume:hasLanguage <https://example.org/resume/dooa-ansari/language/0>,
+        <https://example.org/resume/dooa-ansari/language/1> ;
     resume:hasProfessionalExperience <https://example.org/resume/dooa-ansari/experience/0>,
         <https://example.org/resume/dooa-ansari/experience/1>,
         <https://example.org/resume/dooa-ansari/experience/2>,
@@ -20,8 +22,23 @@
         <https://example.org/resume/dooa-ansari/experience/5> ;
     resume:hasProject <https://example.org/resume/dooa-ansari/project/0>,
         <https://example.org/resume/dooa-ansari/project/1>,
-        <https://example.org/resume/dooa-ansari/project/2> ;
-    resume:hasSkillCategory <https://example.org/resume/dooa-ansari/skill-category/0> ;
+        <https://example.org/resume/dooa-ansari/project/2>,
+        <https://example.org/resume/dooa-ansari/project/3>,
+        <https://example.org/resume/dooa-ansari/project/4>,
+        <https://example.org/resume/dooa-ansari/project/5>,
+        <https://example.org/resume/dooa-ansari/project/6>,
+        <https://example.org/resume/dooa-ansari/project/7>,
+        <https://example.org/resume/dooa-ansari/project/8>,
+        <https://example.org/resume/dooa-ansari/project/9> ;
+    resume:hasSkillCategory <https://example.org/resume/dooa-ansari/skill-category/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/1>,
+        <https://example.org/resume/dooa-ansari/skill-category/2>,
+        <https://example.org/resume/dooa-ansari/skill-category/3>,
+        <https://example.org/resume/dooa-ansari/skill-category/4>,
+        <https://example.org/resume/dooa-ansari/skill-category/5>,
+        <https://example.org/resume/dooa-ansari/skill-category/6>,
+        <https://example.org/resume/dooa-ansari/skill-category/7>,
+        <https://example.org/resume/dooa-ansari/skill-category/8> ;
     resume:hasSkillDetail <https://example.org/resume/dooa-ansari/skill-detail/0>,
         <https://example.org/resume/dooa-ansari/skill-detail/1>,
         <https://example.org/resume/dooa-ansari/skill-detail/10>,
@@ -29,6 +46,9 @@
         <https://example.org/resume/dooa-ansari/skill-detail/12>,
         <https://example.org/resume/dooa-ansari/skill-detail/13>,
         <https://example.org/resume/dooa-ansari/skill-detail/14>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17>,
         <https://example.org/resume/dooa-ansari/skill-detail/2>,
         <https://example.org/resume/dooa-ansari/skill-detail/3>,
         <https://example.org/resume/dooa-ansari/skill-detail/4>,
@@ -42,11 +62,13 @@
     schema:name "DOOA ANSARI" .
 
 <https://example.org/resume/dooa-ansari/academic/0> a resume:AcademicExperience ;
+    resume:challenge "Processing of mapping an existing SPARQL Open Data endpoint to a GraphQL endpoint without losing data integrity" ;
     resume:location "Chemnitz, Germany" ;
     resume:outcome "The thesis outcome proved that the usage of open data can be improved if GraphQL queries are executed over the datasets, eliminating the need for knowledge of RDF and SPARQL Deployment of the platform using free services: AWS, DynamoDB, Cognito, S3 and ECS." ;
     resume:technologyStack "Technology stack: Django, Python, Graphene, RDF, SPARQL, React and Typescript" ;
     resume:year "2025"^^xsd:gYear ;
-    schema:name "Master's Thesis" .
+    schema:name "Master's Thesis" ;
+    schema:url <https://github.com/dooa-ansari/graphqltosparql> .
 
 <https://example.org/resume/dooa-ansari/academic/1> a resume:AcademicExperience ;
     resume:challenge "To scrape the data from the [Across Universities](https://www.across-alliance.eu/) , and then find the similarities between different university modules to find an equivalent module using NLP models. Data must be kept in RDF format and must be processed through SPARQL" ;
@@ -54,23 +76,31 @@
     resume:outcome "The team received first rank out of 10 groups for presentation and demonstration skills" ;
     resume:technologyStack "Technology Stack: React, RDF, Django, SPARQL, Blazegraph, MySQL, AWS and Docker" ;
     resume:year "2024"^^xsd:gYear ;
-    schema:name "CampusFlow" .
+    schema:name "CampusFlow" ;
+    schema:url <https://github.com/dooa-ansari/tuc-planspiel> .
 
 <https://example.org/resume/dooa-ansari/academic/2> a resume:AcademicExperience ;
+    resume:challenge "To fetch the location data from the official [Goverment site](https://data.gov.de/) and then to show the data on the application with markers without overwhelming the external endpoint." ;
     resume:location "Germany" ;
     resume:technologyStack "Technology Stack: ReactJS, NodeJS, Express and MySQL" ;
     resume:year "2024"^^xsd:gYear ;
-    schema:name "CareMap" .
+    schema:name "CareMap" ;
+    schema:url <https://github.com/dooa-ansari/caremap-chemnitz> .
 
 <https://example.org/resume/dooa-ansari/education/0> a resume:Education ;
     resume:dates "10/2022 \\- 09/2025 , Chemnitz, Germany" ;
-    resume:institution "Chemnitz" ;
-    schema:educationalCredentialAwarded "Master of Science in Web Engineering Sir Syed University of Engineering and Technology" .
+    resume:institution "Technische Universität Chemnitz" ;
+    schema:educationalCredentialAwarded "Master of Science in Web Engineering" .
 
 <https://example.org/resume/dooa-ansari/education/1> a resume:Education ;
+    resume:dates "02/2019 \\- 03/2021 , Karachi, Pakistan" ;
+    resume:institution "Sir Syed University of Engineering and Technology" ;
+    schema:educationalCredentialAwarded "Master of Science in Software Engineering" .
+
+<https://example.org/resume/dooa-ansari/education/2> a resume:Education ;
     resume:dates "01/2012 \\- 01/2016, Karachi, Pakistan" ;
-    resume:institution "Master of Science in Software Engineering Sir Syed University of Engineering and Technology" ;
-    schema:educationalCredentialAwarded "Bachelor" .
+    resume:institution "Sir Syed University of Engineering and Technology" ;
+    schema:educationalCredentialAwarded "Bachelor's in Computer Engineering" .
 
 <https://example.org/resume/dooa-ansari/experience/0> a resume:ProfessionalExperience ;
     resume:company "DeepSkill GmbH" ;
@@ -238,53 +268,46 @@
 
 <https://example.org/resume/dooa-ansari/language/0> a resume:Language ;
     resume:language "English" ;
-    resume:proficiency "Full Professional Proficiency (C1) German \\- Beginner (A2)" .
+    resume:proficiency "Full Professional Proficiency (C1)" .
+
+<https://example.org/resume/dooa-ansari/language/1> a resume:Language ;
+    resume:language "German" ;
+    resume:proficiency "Beginner (A2)" .
 
 <https://example.org/resume/dooa-ansari/project/0> a resume:Project ;
-    schema:name "**" .
+    schema:name "CongoEats" .
 
 <https://example.org/resume/dooa-ansari/project/1> a resume:Project ;
-    schema:name "CongoEats, Shippe, Zeitwert, Mindshine, Android Java to Kotlin migration, Android database-level navigation component navigation comes from db, Sirconomy, Meditation Pakistan app, Simplify Fintech Keycloak app" .
+    schema:name "Shippe" .
 
 <https://example.org/resume/dooa-ansari/project/2> a resume:Project ;
-    schema:name "The childrens place," .
+    schema:name "Zeitwert" .
+
+<https://example.org/resume/dooa-ansari/project/3> a resume:Project ;
+    schema:name "Mindshine" .
+
+<https://example.org/resume/dooa-ansari/project/4> a resume:Project ;
+    schema:name "Android Java to Kotlin migration" .
+
+<https://example.org/resume/dooa-ansari/project/5> a resume:Project ;
+    schema:name "Android database-level navigation component navigation comes from db" .
+
+<https://example.org/resume/dooa-ansari/project/6> a resume:Project ;
+    schema:name "Sirconomy" .
+
+<https://example.org/resume/dooa-ansari/project/7> a resume:Project ;
+    schema:name "Meditation Pakistan app" .
+
+<https://example.org/resume/dooa-ansari/project/8> a resume:Project ;
+    schema:name "Simplify Fintech Keycloak app" .
+
+<https://example.org/resume/dooa-ansari/project/9> a resume:Project ;
+    schema:name "The childrens place" .
 
 <https://example.org/resume/dooa-ansari/skill-category/0> a resume:SkillCategory ;
     resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/0/skill/0>,
         <https://example.org/resume/dooa-ansari/skill-category/0/skill/1>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/10>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/11>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/12>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/13>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/14>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/15>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/16>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/17>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/18>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/19>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/2>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/20>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/21>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/22>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/23>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/24>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/25>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/26>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/27>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/28>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/29>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/3>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/30>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/31>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/32>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/33>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/34>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/4>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/5>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/6>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/7>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/8>,
-        <https://example.org/resume/dooa-ansari/skill-category/0/skill/9> ;
+        <https://example.org/resume/dooa-ansari/skill-category/0/skill/2> ;
     resume:skillCategory "Core Languages" .
 
 <https://example.org/resume/dooa-ansari/skill-category/0/skill/0> a resume:Skill ;
@@ -293,104 +316,188 @@
 <https://example.org/resume/dooa-ansari/skill-category/0/skill/1> a resume:Skill ;
     rdf:value "TypeScript" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/10> a resume:Skill ;
-    rdf:value "App Store Backend Frameworks & Architectures: Strapi" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/11> a resume:Skill ;
-    rdf:value "Node.js" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/12> a resume:Skill ;
-    rdf:value "Express.js" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/13> a resume:Skill ;
-    rdf:value "Django" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/14> a resume:Skill ;
-    rdf:value "REST APIs" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/15> a resume:Skill ;
-    rdf:value "GraphQL" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/16> a resume:Skill ;
-    rdf:value "Web Semantics Databases: PostgreSQL" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/17> a resume:Skill ;
-    rdf:value "MongoDB Testing & Quality Assurance: Unit Testing" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/18> a resume:Skill ;
-    rdf:value "Cypress" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/19> a resume:Skill ;
-    rdf:value "Jest DevOps" .
-
 <https://example.org/resume/dooa-ansari/skill-category/0/skill/2> a resume:Skill ;
-    rdf:value "Python Frontend Frameworks & Design: React" .
+    rdf:value "Python" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/20> a resume:Skill ;
-    rdf:value "Cloud & Infrastructure: CI/CD pipelines" .
+<https://example.org/resume/dooa-ansari/skill-category/1> a resume:SkillCategory ;
+    resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/1/skill/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/1/skill/1>,
+        <https://example.org/resume/dooa-ansari/skill-category/1/skill/2>,
+        <https://example.org/resume/dooa-ansari/skill-category/1/skill/3>,
+        <https://example.org/resume/dooa-ansari/skill-category/1/skill/4>,
+        <https://example.org/resume/dooa-ansari/skill-category/1/skill/5> ;
+    resume:skillCategory "Frontend Frameworks & Design" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/21> a resume:Skill ;
-    rdf:value "Git" .
+<https://example.org/resume/dooa-ansari/skill-category/1/skill/0> a resume:Skill ;
+    rdf:value "React" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/22> a resume:Skill ;
-    rdf:value "GitHub Actions" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/23> a resume:Skill ;
-    rdf:value "Docker" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/24> a resume:Skill ;
-    rdf:value "AWS" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/25> a resume:Skill ;
-    rdf:value "Heroku AI Tools: Cursor" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/26> a resume:Skill ;
-    rdf:value "Copilot" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/27> a resume:Skill ;
-    rdf:value "Scalable API" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/28> a resume:Skill ;
-    rdf:value "Google AI Studio" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/29> a resume:Skill ;
-    rdf:value "Skills" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/3> a resume:Skill ;
+<https://example.org/resume/dooa-ansari/skill-category/1/skill/1> a resume:Skill ;
     rdf:value "Next.js" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/30> a resume:Skill ;
-    rdf:value "MCP Methodologies & Teamwork: Agile" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/31> a resume:Skill ;
-    rdf:value "Scrum" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/32> a resume:Skill ;
-    rdf:value "Pair Programming" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/33> a resume:Skill ;
-    rdf:value "Code Review" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/34> a resume:Skill ;
-    rdf:value "Adaptive" .
-
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/4> a resume:Skill ;
+<https://example.org/resume/dooa-ansari/skill-category/1/skill/2> a resume:Skill ;
     rdf:value "Tailwind" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/5> a resume:Skill ;
+<https://example.org/resume/dooa-ansari/skill-category/1/skill/3> a resume:Skill ;
     rdf:value "CSS" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/6> a resume:Skill ;
+<https://example.org/resume/dooa-ansari/skill-category/1/skill/4> a resume:Skill ;
     rdf:value "HTML" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/7> a resume:Skill ;
-    rdf:value "Responsive web designs Mobile Development: React Native" .
+<https://example.org/resume/dooa-ansari/skill-category/1/skill/5> a resume:Skill ;
+    rdf:value "Responsive web designs" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/8> a resume:Skill ;
+<https://example.org/resume/dooa-ansari/skill-category/2> a resume:SkillCategory ;
+    resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/2/skill/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/2/skill/1>,
+        <https://example.org/resume/dooa-ansari/skill-category/2/skill/2>,
+        <https://example.org/resume/dooa-ansari/skill-category/2/skill/3> ;
+    resume:skillCategory "Mobile Development" .
+
+<https://example.org/resume/dooa-ansari/skill-category/2/skill/0> a resume:Skill ;
+    rdf:value "React Native" .
+
+<https://example.org/resume/dooa-ansari/skill-category/2/skill/1> a resume:Skill ;
     rdf:value "Android (Kotlin/Java)" .
 
-<https://example.org/resume/dooa-ansari/skill-category/0/skill/9> a resume:Skill ;
+<https://example.org/resume/dooa-ansari/skill-category/2/skill/2> a resume:Skill ;
     rdf:value "Play Store" .
+
+<https://example.org/resume/dooa-ansari/skill-category/2/skill/3> a resume:Skill ;
+    rdf:value "App Store" .
+
+<https://example.org/resume/dooa-ansari/skill-category/3> a resume:SkillCategory ;
+    resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/3/skill/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/3/skill/1>,
+        <https://example.org/resume/dooa-ansari/skill-category/3/skill/2>,
+        <https://example.org/resume/dooa-ansari/skill-category/3/skill/3>,
+        <https://example.org/resume/dooa-ansari/skill-category/3/skill/4>,
+        <https://example.org/resume/dooa-ansari/skill-category/3/skill/5>,
+        <https://example.org/resume/dooa-ansari/skill-category/3/skill/6> ;
+    resume:skillCategory "Backend Frameworks & Architectures" .
+
+<https://example.org/resume/dooa-ansari/skill-category/3/skill/0> a resume:Skill ;
+    rdf:value "Strapi" .
+
+<https://example.org/resume/dooa-ansari/skill-category/3/skill/1> a resume:Skill ;
+    rdf:value "Node.js" .
+
+<https://example.org/resume/dooa-ansari/skill-category/3/skill/2> a resume:Skill ;
+    rdf:value "Express.js" .
+
+<https://example.org/resume/dooa-ansari/skill-category/3/skill/3> a resume:Skill ;
+    rdf:value "Django" .
+
+<https://example.org/resume/dooa-ansari/skill-category/3/skill/4> a resume:Skill ;
+    rdf:value "REST APIs" .
+
+<https://example.org/resume/dooa-ansari/skill-category/3/skill/5> a resume:Skill ;
+    rdf:value "GraphQL" .
+
+<https://example.org/resume/dooa-ansari/skill-category/3/skill/6> a resume:Skill ;
+    rdf:value "Web Semantics" .
+
+<https://example.org/resume/dooa-ansari/skill-category/4> a resume:SkillCategory ;
+    resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/4/skill/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/4/skill/1> ;
+    resume:skillCategory "Databases" .
+
+<https://example.org/resume/dooa-ansari/skill-category/4/skill/0> a resume:Skill ;
+    rdf:value "PostgreSQL" .
+
+<https://example.org/resume/dooa-ansari/skill-category/4/skill/1> a resume:Skill ;
+    rdf:value "MongoDB" .
+
+<https://example.org/resume/dooa-ansari/skill-category/5> a resume:SkillCategory ;
+    resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/5/skill/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/5/skill/1>,
+        <https://example.org/resume/dooa-ansari/skill-category/5/skill/2> ;
+    resume:skillCategory "Testing & Quality Assurance" .
+
+<https://example.org/resume/dooa-ansari/skill-category/5/skill/0> a resume:Skill ;
+    rdf:value "Unit Testing" .
+
+<https://example.org/resume/dooa-ansari/skill-category/5/skill/1> a resume:Skill ;
+    rdf:value "Cypress" .
+
+<https://example.org/resume/dooa-ansari/skill-category/5/skill/2> a resume:Skill ;
+    rdf:value "Jest" .
+
+<https://example.org/resume/dooa-ansari/skill-category/6> a resume:SkillCategory ;
+    resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/6/skill/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/6/skill/1>,
+        <https://example.org/resume/dooa-ansari/skill-category/6/skill/2>,
+        <https://example.org/resume/dooa-ansari/skill-category/6/skill/3>,
+        <https://example.org/resume/dooa-ansari/skill-category/6/skill/4>,
+        <https://example.org/resume/dooa-ansari/skill-category/6/skill/5> ;
+    resume:skillCategory "DevOps, Cloud & Infrastructure" .
+
+<https://example.org/resume/dooa-ansari/skill-category/6/skill/0> a resume:Skill ;
+    rdf:value "CI/CD pipelines" .
+
+<https://example.org/resume/dooa-ansari/skill-category/6/skill/1> a resume:Skill ;
+    rdf:value "Git" .
+
+<https://example.org/resume/dooa-ansari/skill-category/6/skill/2> a resume:Skill ;
+    rdf:value "GitHub Actions" .
+
+<https://example.org/resume/dooa-ansari/skill-category/6/skill/3> a resume:Skill ;
+    rdf:value "Docker" .
+
+<https://example.org/resume/dooa-ansari/skill-category/6/skill/4> a resume:Skill ;
+    rdf:value "AWS" .
+
+<https://example.org/resume/dooa-ansari/skill-category/6/skill/5> a resume:Skill ;
+    rdf:value "Heroku" .
+
+<https://example.org/resume/dooa-ansari/skill-category/7> a resume:SkillCategory ;
+    resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/7/skill/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/7/skill/1>,
+        <https://example.org/resume/dooa-ansari/skill-category/7/skill/2>,
+        <https://example.org/resume/dooa-ansari/skill-category/7/skill/3>,
+        <https://example.org/resume/dooa-ansari/skill-category/7/skill/4>,
+        <https://example.org/resume/dooa-ansari/skill-category/7/skill/5> ;
+    resume:skillCategory "AI Tools" .
+
+<https://example.org/resume/dooa-ansari/skill-category/7/skill/0> a resume:Skill ;
+    rdf:value "Cursor" .
+
+<https://example.org/resume/dooa-ansari/skill-category/7/skill/1> a resume:Skill ;
+    rdf:value "Copilot" .
+
+<https://example.org/resume/dooa-ansari/skill-category/7/skill/2> a resume:Skill ;
+    rdf:value "Scalable API" .
+
+<https://example.org/resume/dooa-ansari/skill-category/7/skill/3> a resume:Skill ;
+    rdf:value "Google AI Studio" .
+
+<https://example.org/resume/dooa-ansari/skill-category/7/skill/4> a resume:Skill ;
+    rdf:value "Skills" .
+
+<https://example.org/resume/dooa-ansari/skill-category/7/skill/5> a resume:Skill ;
+    rdf:value "MCP" .
+
+<https://example.org/resume/dooa-ansari/skill-category/8> a resume:SkillCategory ;
+    resume:hasSkill <https://example.org/resume/dooa-ansari/skill-category/8/skill/0>,
+        <https://example.org/resume/dooa-ansari/skill-category/8/skill/1>,
+        <https://example.org/resume/dooa-ansari/skill-category/8/skill/2>,
+        <https://example.org/resume/dooa-ansari/skill-category/8/skill/3>,
+        <https://example.org/resume/dooa-ansari/skill-category/8/skill/4> ;
+    resume:skillCategory "Methodologies & Teamwork" .
+
+<https://example.org/resume/dooa-ansari/skill-category/8/skill/0> a resume:Skill ;
+    rdf:value "Agile" .
+
+<https://example.org/resume/dooa-ansari/skill-category/8/skill/1> a resume:Skill ;
+    rdf:value "Scrum" .
+
+<https://example.org/resume/dooa-ansari/skill-category/8/skill/2> a resume:Skill ;
+    rdf:value "Pair Programming" .
+
+<https://example.org/resume/dooa-ansari/skill-category/8/skill/3> a resume:Skill ;
+    rdf:value "Code Review" .
+
+<https://example.org/resume/dooa-ansari/skill-category/8/skill/4> a resume:Skill ;
+    rdf:value "Adaptive" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/0> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/0/item/0>,
@@ -842,171 +949,347 @@
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/34>,
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/35>,
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/36>,
+        <https://example.org/resume/dooa-ansari/skill-detail/10/item/37>,
+        <https://example.org/resume/dooa-ansari/skill-detail/10/item/38>,
+        <https://example.org/resume/dooa-ansari/skill-detail/10/item/39>,
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/4>,
+        <https://example.org/resume/dooa-ansari/skill-detail/10/item/40>,
+        <https://example.org/resume/dooa-ansari/skill-detail/10/item/41>,
+        <https://example.org/resume/dooa-ansari/skill-detail/10/item/42>,
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/10/item/9> ;
-    schema:name "Responsive Web Design" .
+    schema:name "NextJS" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/0> a resume:SkillItem ;
-    rdf:value "Responsive Web Design" .
+    rdf:value "Next.js" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/1> a resume:SkillItem ;
-    rdf:value "Mobile-First Approach" .
+    rdf:value "React" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/10> a resume:SkillItem ;
-    rdf:value "ch)" .
+    rdf:value "Dynamic Routes" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/11> a resume:SkillItem ;
-    rdf:value "CSS Flexbox" .
+    rdf:value "Catch-all Routes" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/12> a resume:SkillItem ;
-    rdf:value "CSS Grid" .
+    rdf:value "Parallel Routes" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/13> a resume:SkillItem ;
-    rdf:value "CSS Subgrid" .
+    rdf:value "Intercepting Routes" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/14> a resume:SkillItem ;
-    rdf:value "Clamp()" .
+    rdf:value "Middleware" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/15> a resume:SkillItem ;
-    rdf:value "Min()" .
+    rdf:value "Server-Side Rendering (SSR)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/16> a resume:SkillItem ;
-    rdf:value "Max()" .
+    rdf:value "Static Site Generation (SSG)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/17> a resume:SkillItem ;
-    rdf:value "Fluid Typography" .
+    rdf:value "Incremental Static Regeneration (ISR)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/18> a resume:SkillItem ;
-    rdf:value "Responsive Images (srcset" .
+    rdf:value "Client-Side Rendering (CSR)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/19> a resume:SkillItem ;
-    rdf:value "sizes" .
+    rdf:value "next/image" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/2> a resume:SkillItem ;
-    rdf:value "Media Queries" .
+    rdf:value "JavaScript" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/20> a resume:SkillItem ;
-    rdf:value "\\<picture\\>)" .
+    rdf:value "next/font" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/21> a resume:SkillItem ;
-    rdf:value "Aspect Ratio (aspect-ratio)" .
+    rdf:value "next/link" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/22> a resume:SkillItem ;
-    rdf:value "Object Fit (object-fit)" .
+    rdf:value "next/script" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/23> a resume:SkillItem ;
-    rdf:value "CSS Container Queries" .
+    rdf:value "Vercel" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/24> a resume:SkillItem ;
-    rdf:value "Container Query Units (cqw" .
+    rdf:value "Turbopack" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/25> a resume:SkillItem ;
-    rdf:value "cqh" .
+    rdf:value "Webpack" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/26> a resume:SkillItem ;
-    rdf:value "cqi" .
+    rdf:value "API Routes" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/27> a resume:SkillItem ;
-    rdf:value "cqb)" .
+    rdf:value "Hydration" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/28> a resume:SkillItem ;
-    rdf:value "Touch Targets" .
+    rdf:value "Streaming" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/29> a resume:SkillItem ;
-    rdf:value "Flexible Navigation" .
+    rdf:value "Suspense" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/3> a resume:SkillItem ;
-    rdf:value "Viewport Meta Tag" .
+    rdf:value "TypeScript" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/30> a resume:SkillItem ;
-    rdf:value "Hamburger Menu" .
+    rdf:value "Metadata API" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/31> a resume:SkillItem ;
-    rdf:value "Hidden-Overflow Prevention" .
+    rdf:value "Open Graph" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/32> a resume:SkillItem ;
-    rdf:value "Cross-Browser Compatibility" .
+    rdf:value "Sitemap Generation" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/33> a resume:SkillItem ;
-    rdf:value "Accessibility (WCAG)" .
+    rdf:value "next.config.js" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/34> a resume:SkillItem ;
-    rdf:value "Device Emulation" .
+    rdf:value "next-auth" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/35> a resume:SkillItem ;
-    rdf:value "Chrome DevTools Device Mode" .
+    rdf:value "Auth.js" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/36> a resume:SkillItem ;
-    rdf:value "Lighthouse Audit" .
+    rdf:value "Prisma" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/10/item/37> a resume:SkillItem ;
+    rdf:value "Drizzle ORM" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/10/item/38> a resume:SkillItem ;
+    rdf:value "Tailwind CSS" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/10/item/39> a resume:SkillItem ;
+    rdf:value "Jest" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/4> a resume:SkillItem ;
-    rdf:value "Fluid Grid Layouts" .
+    rdf:value "App Router" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/10/item/40> a resume:SkillItem ;
+    rdf:value "Playwright" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/10/item/41> a resume:SkillItem ;
+    rdf:value "Cypress" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/10/item/42> a resume:SkillItem ;
+    rdf:value "Lighthouse" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/5> a resume:SkillItem ;
-    rdf:value "Relative Units (vw" .
+    rdf:value "Pages Router" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/6> a resume:SkillItem ;
-    rdf:value "vh" .
+    rdf:value "Server Components (RSC)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/7> a resume:SkillItem ;
-    rdf:value "rem" .
+    rdf:value "Client Components" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/8> a resume:SkillItem ;
-    rdf:value "em" .
+    rdf:value "Server Actions" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/10/item/9> a resume:SkillItem ;
-    rdf:value "%" .
+    rdf:value "Route Handlers" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/11/item/0>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/1>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/10>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/11>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/12>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/13>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/14>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/15>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/16>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/17>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/18>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/19>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/2>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/20>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/21>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/22>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/23>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/24>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/25>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/26>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/27>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/28>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/29>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/3>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/30>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/31>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/32>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/33>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/34>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/35>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/36>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/37>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/38>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/39>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/4>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/40>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/41>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/42>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/43>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/44>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/45>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/46>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/47>,
+        <https://example.org/resume/dooa-ansari/skill-detail/11/item/48>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/11/item/9> ;
-    schema:name "UI/UX Design" .
+    schema:name "TypeScript" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/0> a resume:SkillItem ;
-    rdf:value "Storybook" .
+    rdf:value "TypeScript" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/1> a resume:SkillItem ;
-    rdf:value "Ladle" .
+    rdf:value "JavaScript" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/10> a resume:SkillItem ;
-    rdf:value "Chakra UI" .
+    rdf:value "Literal Types" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/11> a resume:SkillItem ;
+    rdf:value "Tuple Types" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/12> a resume:SkillItem ;
+    rdf:value "Enums" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/13> a resume:SkillItem ;
+    rdf:value "Const Enums" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/14> a resume:SkillItem ;
+    rdf:value "Generics" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/15> a resume:SkillItem ;
+    rdf:value "Type Guards" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/16> a resume:SkillItem ;
+    rdf:value "Type Assertions" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/17> a resume:SkillItem ;
+    rdf:value "Type Narrowing" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/18> a resume:SkillItem ;
+    rdf:value "Discriminated Unions" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/19> a resume:SkillItem ;
+    rdf:value "Utility Types (Partial" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/2> a resume:SkillItem ;
-    rdf:value "Styleguidist" .
+    rdf:value "Type System" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/20> a resume:SkillItem ;
+    rdf:value "Required" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/21> a resume:SkillItem ;
+    rdf:value "Readonly" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/22> a resume:SkillItem ;
+    rdf:value "Record" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/23> a resume:SkillItem ;
+    rdf:value "Pick" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/24> a resume:SkillItem ;
+    rdf:value "Omit" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/25> a resume:SkillItem ;
+    rdf:value "Extract" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/26> a resume:SkillItem ;
+    rdf:value "Exclude" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/27> a resume:SkillItem ;
+    rdf:value "NonNullable" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/28> a resume:SkillItem ;
+    rdf:value "ReturnType" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/29> a resume:SkillItem ;
+    rdf:value "Parameters)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/3> a resume:SkillItem ;
-    rdf:value "Figma" .
+    rdf:value "Static Typing" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/30> a resume:SkillItem ;
+    rdf:value "Conditional Types" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/31> a resume:SkillItem ;
+    rdf:value "Mapped Types" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/32> a resume:SkillItem ;
+    rdf:value "Template Literal Types" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/33> a resume:SkillItem ;
+    rdf:value "Index Signatures" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/34> a resume:SkillItem ;
+    rdf:value "Keyof Operator" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/35> a resume:SkillItem ;
+    rdf:value "Typeof Operator" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/36> a resume:SkillItem ;
+    rdf:value "any" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/37> a resume:SkillItem ;
+    rdf:value "unknown" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/38> a resume:SkillItem ;
+    rdf:value "never" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/39> a resume:SkillItem ;
+    rdf:value "void" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/4> a resume:SkillItem ;
-    rdf:value "Tailwind UI" .
+    rdf:value "Type Inference" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/40> a resume:SkillItem ;
+    rdf:value "Modules" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/41> a resume:SkillItem ;
+    rdf:value "Namespaces" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/42> a resume:SkillItem ;
+    rdf:value "Decorators" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/43> a resume:SkillItem ;
+    rdf:value "Declaration Files (.d.ts)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/44> a resume:SkillItem ;
+    rdf:value "tsconfig.json" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/45> a resume:SkillItem ;
+    rdf:value "tsc (TypeScript Compiler)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/46> a resume:SkillItem ;
+    rdf:value "Strict Mode" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/47> a resume:SkillItem ;
+    rdf:value "ESLint" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/11/item/48> a resume:SkillItem ;
+    rdf:value "Prettier" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/5> a resume:SkillItem ;
-    rdf:value "Shadcn UI" .
+    rdf:value "Type Annotations" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/6> a resume:SkillItem ;
-    rdf:value "Radix UI" .
+    rdf:value "Interfaces" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/7> a resume:SkillItem ;
-    rdf:value "Headless UI" .
+    rdf:value "Type Aliases" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/8> a resume:SkillItem ;
-    rdf:value "Material-UI" .
+    rdf:value "Union Types" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/11/item/9> a resume:SkillItem ;
-    rdf:value "Ant Design" .
+    rdf:value "Intersection Types" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/12/item/0>,
@@ -1038,285 +1321,173 @@
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/32>,
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/33>,
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/34>,
+        <https://example.org/resume/dooa-ansari/skill-detail/12/item/35>,
+        <https://example.org/resume/dooa-ansari/skill-detail/12/item/36>,
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/4>,
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/12/item/9> ;
-    schema:name "Accessiblity Standards" .
+    schema:name "Responsive Web Design" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/0> a resume:SkillItem ;
-    rdf:value "WCAG" .
+    rdf:value "Responsive Web Design" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/1> a resume:SkillItem ;
-    rdf:value "Section 508" .
+    rdf:value "Mobile-First Approach" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/10> a resume:SkillItem ;
-    rdf:value "Color Contrast" .
+    rdf:value "ch)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/11> a resume:SkillItem ;
-    rdf:value "Keyboard Navigation" .
+    rdf:value "CSS Flexbox" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/12> a resume:SkillItem ;
-    rdf:value "Focus Trap" .
+    rdf:value "CSS Grid" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/13> a resume:SkillItem ;
-    rdf:value "Screen Reader" .
+    rdf:value "CSS Subgrid" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/14> a resume:SkillItem ;
-    rdf:value "Alt Text" .
+    rdf:value "Clamp()" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/15> a resume:SkillItem ;
-    rdf:value "ARIA Labels" .
+    rdf:value "Min()" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/16> a resume:SkillItem ;
-    rdf:value "ARIA Roles" .
+    rdf:value "Max()" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/17> a resume:SkillItem ;
-    rdf:value "ARIA Live Regions" .
+    rdf:value "Fluid Typography" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/18> a resume:SkillItem ;
-    rdf:value "Semantic HTML" .
+    rdf:value "Responsive Images (srcset" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/19> a resume:SkillItem ;
-    rdf:value "Skip Links" .
+    rdf:value "sizes" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/2> a resume:SkillItem ;
-    rdf:value "ADA" .
+    rdf:value "Media Queries" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/20> a resume:SkillItem ;
-    rdf:value "Touch Targets" .
+    rdf:value "\\<picture\\>)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/21> a resume:SkillItem ;
-    rdf:value "Text Scaling" .
+    rdf:value "Aspect Ratio (aspect-ratio)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/22> a resume:SkillItem ;
-    rdf:value "Responsive Design" .
+    rdf:value "Object Fit (object-fit)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/23> a resume:SkillItem ;
-    rdf:value "Motion Reduction" .
+    rdf:value "CSS Container Queries" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/24> a resume:SkillItem ;
-    rdf:value "Captions" .
+    rdf:value "Container Query Units (cqw" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/25> a resume:SkillItem ;
-    rdf:value "Transcripts" .
+    rdf:value "cqh" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/26> a resume:SkillItem ;
-    rdf:value "Audio Descriptions" .
+    rdf:value "cqi" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/27> a resume:SkillItem ;
-    rdf:value "Form Labels" .
+    rdf:value "cqb)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/28> a resume:SkillItem ;
-    rdf:value "Error Identification" .
+    rdf:value "Touch Targets" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/29> a resume:SkillItem ;
-    rdf:value "Consistent Navigation" .
+    rdf:value "Flexible Navigation" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/3> a resume:SkillItem ;
-    rdf:value "EN 301 549" .
+    rdf:value "Viewport Meta Tag" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/30> a resume:SkillItem ;
-    rdf:value "Accessibility Audit" .
+    rdf:value "Hamburger Menu" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/31> a resume:SkillItem ;
-    rdf:value "Automated Testing" .
+    rdf:value "Hidden-Overflow Prevention" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/32> a resume:SkillItem ;
-    rdf:value "Axe" .
+    rdf:value "Cross-Browser Compatibility" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/33> a resume:SkillItem ;
-    rdf:value "Lighthouse" .
+    rdf:value "Accessibility (WCAG)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/34> a resume:SkillItem ;
-    rdf:value "Manual Testing" .
+    rdf:value "Device Emulation" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/12/item/35> a resume:SkillItem ;
+    rdf:value "Chrome DevTools Device Mode" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/12/item/36> a resume:SkillItem ;
+    rdf:value "Lighthouse Audit" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/4> a resume:SkillItem ;
-    rdf:value "WAI-ARIA" .
+    rdf:value "Fluid Grid Layouts" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/5> a resume:SkillItem ;
-    rdf:value "Perceivable" .
+    rdf:value "Relative Units (vw" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/6> a resume:SkillItem ;
-    rdf:value "Operable" .
+    rdf:value "vh" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/7> a resume:SkillItem ;
-    rdf:value "Understandable" .
+    rdf:value "rem" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/8> a resume:SkillItem ;
-    rdf:value "Robust" .
+    rdf:value "em" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/12/item/9> a resume:SkillItem ;
-    rdf:value "Contrast Ratio" .
+    rdf:value "%" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/13/item/0>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/1>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/10>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/11>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/12>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/13>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/14>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/15>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/16>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/17>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/18>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/19>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/2>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/20>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/21>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/22>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/23>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/24>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/25>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/26>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/27>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/28>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/29>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/3>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/30>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/31>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/32>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/33>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/34>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/35>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/36>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/37>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/38>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/39>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/4>,
-        <https://example.org/resume/dooa-ansari/skill-detail/13/item/40>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/13/item/9> ;
-    schema:name "GDPR" .
+    schema:name "UI/UX Design" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/0> a resume:SkillItem ;
-    rdf:value "GDPR" .
+    rdf:value "Storybook" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/1> a resume:SkillItem ;
-    rdf:value "General Data Protection Regulation" .
+    rdf:value "Ladle" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/10> a resume:SkillItem ;
-    rdf:value "Purpose Limitation" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/11> a resume:SkillItem ;
-    rdf:value "Data Minimization" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/12> a resume:SkillItem ;
-    rdf:value "Accuracy" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/13> a resume:SkillItem ;
-    rdf:value "Storage Limitation" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/14> a resume:SkillItem ;
-    rdf:value "Integrity and Confidentiality" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/15> a resume:SkillItem ;
-    rdf:value "Accountability" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/16> a resume:SkillItem ;
-    rdf:value "Right to be Informed" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/17> a resume:SkillItem ;
-    rdf:value "Right of Access" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/18> a resume:SkillItem ;
-    rdf:value "Right to Rectification" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/19> a resume:SkillItem ;
-    rdf:value "Right to Erasure (Right to be Forgotten)" .
+    rdf:value "Chakra UI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/2> a resume:SkillItem ;
-    rdf:value "Data Controller" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/20> a resume:SkillItem ;
-    rdf:value "Right to Restriction of Processing" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/21> a resume:SkillItem ;
-    rdf:value "Right to Data Portability" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/22> a resume:SkillItem ;
-    rdf:value "Right to Object" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/23> a resume:SkillItem ;
-    rdf:value "Automated Decision-Making" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/24> a resume:SkillItem ;
-    rdf:value "Privacy Policy" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/25> a resume:SkillItem ;
-    rdf:value "Cookie Consent" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/26> a resume:SkillItem ;
-    rdf:value "Cookie Banner" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/27> a resume:SkillItem ;
-    rdf:value "Data Protection Officer (DPO)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/28> a resume:SkillItem ;
-    rdf:value "Data Protection Impact Assessment (DPIA)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/29> a resume:SkillItem ;
-    rdf:value "Records of Processing Activities (ROPA)" .
+    rdf:value "Styleguidist" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/3> a resume:SkillItem ;
-    rdf:value "Data Processor" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/30> a resume:SkillItem ;
-    rdf:value "Data Processing Agreement (DPA)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/31> a resume:SkillItem ;
-    rdf:value "Standard Contractual Clauses (SCCs)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/32> a resume:SkillItem ;
-    rdf:value "Cross-Border Data Transfer" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/33> a resume:SkillItem ;
-    rdf:value "Data Breach Notification" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/34> a resume:SkillItem ;
-    rdf:value "72-Hour Breach Rule" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/35> a resume:SkillItem ;
-    rdf:value "Privacy by Design" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/36> a resume:SkillItem ;
-    rdf:value "Privacy by Default" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/37> a resume:SkillItem ;
-    rdf:value "Pseudonymization" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/38> a resume:SkillItem ;
-    rdf:value "Anonymization" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/39> a resume:SkillItem ;
-    rdf:value "Encryption" .
+    rdf:value "Figma" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/4> a resume:SkillItem ;
-    rdf:value "Data Subject" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/13/item/40> a resume:SkillItem ;
-    rdf:value "Supervisory Authority" .
+    rdf:value "Tailwind UI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/5> a resume:SkillItem ;
-    rdf:value "Personal Data" .
+    rdf:value "Shadcn UI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/6> a resume:SkillItem ;
-    rdf:value "Special Categories of Data" .
+    rdf:value "Radix UI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/7> a resume:SkillItem ;
-    rdf:value "Lawful Basis" .
+    rdf:value "Headless UI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/8> a resume:SkillItem ;
-    rdf:value "Consent" .
+    rdf:value "Material-UI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/13/item/9> a resume:SkillItem ;
-    rdf:value "Explicit Consent" .
+    rdf:value "Ant Design" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/14/item/0>,
@@ -1346,127 +1517,572 @@
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/30>,
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/31>,
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/32>,
-        <https://example.org/resume/dooa-ansari/skill-detail/14/item/33>,
-        <https://example.org/resume/dooa-ansari/skill-detail/14/item/34>,
-        <https://example.org/resume/dooa-ansari/skill-detail/14/item/35>,
-        <https://example.org/resume/dooa-ansari/skill-detail/14/item/36>,
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/4>,
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/14/item/9> ;
-    schema:name "AI" .
+    schema:name "Responsive Mobile Design" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/0> a resume:SkillItem ;
-    rdf:value "Prompt Engineering" .
+    rdf:value "Responsive Mobile Design" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/1> a resume:SkillItem ;
-    rdf:value "Large Language Models (LLMs)" .
+    rdf:value "Fluid Layouts" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/10> a resume:SkillItem ;
-    rdf:value "LlamaIndex" .
+    rdf:value "Constraint-Based Layouts" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/11> a resume:SkillItem ;
-    rdf:value "CrewAI" .
+    rdf:value "Fluid Typography" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/12> a resume:SkillItem ;
-    rdf:value "AutoGen" .
+    rdf:value "Dynamic Type" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/13> a resume:SkillItem ;
-    rdf:value "DSPy" .
+    rdf:value "Safe Area Layout Guides" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/14> a resume:SkillItem ;
-    rdf:value "OpenAI API" .
+    rdf:value "Aspect Ratio Scaling" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/15> a resume:SkillItem ;
-    rdf:value "Anthropic Claude API" .
+    rdf:value "Adaptive Layouts" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/16> a resume:SkillItem ;
-    rdf:value "Hugging Face Transformers" .
+    rdf:value "Breakpoints" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/17> a resume:SkillItem ;
-    rdf:value "PyTorch" .
+    rdf:value "Multi-Window Mode" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/18> a resume:SkillItem ;
-    rdf:value "TensorFlow" .
+    rdf:value "Split Screen" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/19> a resume:SkillItem ;
-    rdf:value "LangGraph" .
+    rdf:value "Tablet Optimization" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/2> a resume:SkillItem ;
-    rdf:value "Retrieval-Augmented Generation (RAG)" .
+    rdf:value "Safe Area Insets" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/20> a resume:SkillItem ;
-    rdf:value "LangSmith" .
+    rdf:value "Landscape Orientation" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/21> a resume:SkillItem ;
-    rdf:value "Cursor" .
+    rdf:value "Portrait Orientation" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/22> a resume:SkillItem ;
-    rdf:value "Windsurf" .
+    rdf:value "Touch Targets" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/23> a resume:SkillItem ;
-    rdf:value "GitHub Copilot" .
+    rdf:value "Finger-Friendly UI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/24> a resume:SkillItem ;
-    rdf:value "Claude Code" .
+    rdf:value "Thumb Zone Ergonomics" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/25> a resume:SkillItem ;
-    rdf:value "Ollama" .
+    rdf:value "Gesture Navigation" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/26> a resume:SkillItem ;
-    rdf:value "vLLM" .
+    rdf:value "Keyboard Avoidance" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/27> a resume:SkillItem ;
-    rdf:value "Llama.cpp" .
+    rdf:value "Responsive ScrollViews" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/28> a resume:SkillItem ;
-    rdf:value "Multi-Agent Systems" .
+    rdf:value "Adaptive Navigation Bars" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/29> a resume:SkillItem ;
-    rdf:value "AI Agents" .
+    rdf:value "Responsive Grids" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/3> a resume:SkillItem ;
-    rdf:value "Fine-Tuning" .
+    rdf:value "Notch Handling" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/30> a resume:SkillItem ;
-    rdf:value "Function Calling" .
+    rdf:value "Device Emulation" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/31> a resume:SkillItem ;
-    rdf:value "Tool Use" .
+    rdf:value "Figma Variants" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/32> a resume:SkillItem ;
-    rdf:value "Guardrails AI" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/14/item/33> a resume:SkillItem ;
-    rdf:value "NeMo Guardrails" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/14/item/34> a resume:SkillItem ;
-    rdf:value "Evaluation Frameworks (TruLens" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/14/item/35> a resume:SkillItem ;
-    rdf:value "Ragas)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/14/item/36> a resume:SkillItem ;
-    rdf:value "MLOps" .
+    rdf:value "Auto Layout Constraints" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/4> a resume:SkillItem ;
-    rdf:value "Vector Databases (Pinecone" .
+    rdf:value "Dynamic Island" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/5> a resume:SkillItem ;
-    rdf:value "Chroma" .
+    rdf:value "Screen Density (dpi" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/6> a resume:SkillItem ;
-    rdf:value "Milvus" .
+    rdf:value "ppx)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/7> a resume:SkillItem ;
-    rdf:value "Qdrant)" .
+    rdf:value "Resolution Independence" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/8> a resume:SkillItem ;
-    rdf:value "Embeddings" .
+    rdf:value "Scalable Vector Graphics (SVG)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/14/item/9> a resume:SkillItem ;
+    rdf:value "Auto Layout" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15> a resume:SkillDetail ;
+    resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/15/item/0>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/1>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/10>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/11>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/12>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/13>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/14>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/15>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/16>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/17>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/18>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/19>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/2>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/20>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/21>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/22>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/23>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/24>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/25>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/26>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/27>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/28>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/29>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/3>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/30>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/31>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/32>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/33>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/34>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/4>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/5>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/6>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/7>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/8>,
+        <https://example.org/resume/dooa-ansari/skill-detail/15/item/9> ;
+    schema:name "Accessiblity Standards" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/0> a resume:SkillItem ;
+    rdf:value "WCAG" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/1> a resume:SkillItem ;
+    rdf:value "Section 508" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/10> a resume:SkillItem ;
+    rdf:value "Color Contrast" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/11> a resume:SkillItem ;
+    rdf:value "Keyboard Navigation" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/12> a resume:SkillItem ;
+    rdf:value "Focus Trap" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/13> a resume:SkillItem ;
+    rdf:value "Screen Reader" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/14> a resume:SkillItem ;
+    rdf:value "Alt Text" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/15> a resume:SkillItem ;
+    rdf:value "ARIA Labels" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/16> a resume:SkillItem ;
+    rdf:value "ARIA Roles" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/17> a resume:SkillItem ;
+    rdf:value "ARIA Live Regions" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/18> a resume:SkillItem ;
+    rdf:value "Semantic HTML" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/19> a resume:SkillItem ;
+    rdf:value "Skip Links" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/2> a resume:SkillItem ;
+    rdf:value "ADA" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/20> a resume:SkillItem ;
+    rdf:value "Touch Targets" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/21> a resume:SkillItem ;
+    rdf:value "Text Scaling" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/22> a resume:SkillItem ;
+    rdf:value "Responsive Design" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/23> a resume:SkillItem ;
+    rdf:value "Motion Reduction" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/24> a resume:SkillItem ;
+    rdf:value "Captions" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/25> a resume:SkillItem ;
+    rdf:value "Transcripts" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/26> a resume:SkillItem ;
+    rdf:value "Audio Descriptions" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/27> a resume:SkillItem ;
+    rdf:value "Form Labels" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/28> a resume:SkillItem ;
+    rdf:value "Error Identification" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/29> a resume:SkillItem ;
+    rdf:value "Consistent Navigation" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/3> a resume:SkillItem ;
+    rdf:value "EN 301 549" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/30> a resume:SkillItem ;
+    rdf:value "Accessibility Audit" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/31> a resume:SkillItem ;
+    rdf:value "Automated Testing" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/32> a resume:SkillItem ;
+    rdf:value "Axe" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/33> a resume:SkillItem ;
+    rdf:value "Lighthouse" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/34> a resume:SkillItem ;
+    rdf:value "Manual Testing" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/4> a resume:SkillItem ;
+    rdf:value "WAI-ARIA" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/5> a resume:SkillItem ;
+    rdf:value "Perceivable" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/6> a resume:SkillItem ;
+    rdf:value "Operable" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/7> a resume:SkillItem ;
+    rdf:value "Understandable" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/8> a resume:SkillItem ;
+    rdf:value "Robust" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/15/item/9> a resume:SkillItem ;
+    rdf:value "Contrast Ratio" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16> a resume:SkillDetail ;
+    resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/16/item/0>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/1>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/10>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/11>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/12>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/13>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/14>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/15>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/16>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/17>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/18>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/19>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/2>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/20>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/21>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/22>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/23>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/24>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/25>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/26>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/27>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/28>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/29>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/3>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/30>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/31>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/32>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/33>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/34>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/35>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/36>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/37>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/38>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/39>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/4>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/40>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/5>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/6>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/7>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/8>,
+        <https://example.org/resume/dooa-ansari/skill-detail/16/item/9> ;
+    schema:name "GDPR" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/0> a resume:SkillItem ;
+    rdf:value "GDPR" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/1> a resume:SkillItem ;
+    rdf:value "General Data Protection Regulation" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/10> a resume:SkillItem ;
+    rdf:value "Purpose Limitation" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/11> a resume:SkillItem ;
+    rdf:value "Data Minimization" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/12> a resume:SkillItem ;
+    rdf:value "Accuracy" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/13> a resume:SkillItem ;
+    rdf:value "Storage Limitation" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/14> a resume:SkillItem ;
+    rdf:value "Integrity and Confidentiality" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/15> a resume:SkillItem ;
+    rdf:value "Accountability" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/16> a resume:SkillItem ;
+    rdf:value "Right to be Informed" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/17> a resume:SkillItem ;
+    rdf:value "Right of Access" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/18> a resume:SkillItem ;
+    rdf:value "Right to Rectification" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/19> a resume:SkillItem ;
+    rdf:value "Right to Erasure (Right to be Forgotten)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/2> a resume:SkillItem ;
+    rdf:value "Data Controller" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/20> a resume:SkillItem ;
+    rdf:value "Right to Restriction of Processing" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/21> a resume:SkillItem ;
+    rdf:value "Right to Data Portability" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/22> a resume:SkillItem ;
+    rdf:value "Right to Object" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/23> a resume:SkillItem ;
+    rdf:value "Automated Decision-Making" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/24> a resume:SkillItem ;
+    rdf:value "Privacy Policy" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/25> a resume:SkillItem ;
+    rdf:value "Cookie Consent" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/26> a resume:SkillItem ;
+    rdf:value "Cookie Banner" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/27> a resume:SkillItem ;
+    rdf:value "Data Protection Officer (DPO)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/28> a resume:SkillItem ;
+    rdf:value "Data Protection Impact Assessment (DPIA)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/29> a resume:SkillItem ;
+    rdf:value "Records of Processing Activities (ROPA)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/3> a resume:SkillItem ;
+    rdf:value "Data Processor" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/30> a resume:SkillItem ;
+    rdf:value "Data Processing Agreement (DPA)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/31> a resume:SkillItem ;
+    rdf:value "Standard Contractual Clauses (SCCs)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/32> a resume:SkillItem ;
+    rdf:value "Cross-Border Data Transfer" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/33> a resume:SkillItem ;
+    rdf:value "Data Breach Notification" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/34> a resume:SkillItem ;
+    rdf:value "72-Hour Breach Rule" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/35> a resume:SkillItem ;
+    rdf:value "Privacy by Design" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/36> a resume:SkillItem ;
+    rdf:value "Privacy by Default" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/37> a resume:SkillItem ;
+    rdf:value "Pseudonymization" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/38> a resume:SkillItem ;
+    rdf:value "Anonymization" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/39> a resume:SkillItem ;
+    rdf:value "Encryption" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/4> a resume:SkillItem ;
+    rdf:value "Data Subject" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/40> a resume:SkillItem ;
+    rdf:value "Supervisory Authority" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/5> a resume:SkillItem ;
+    rdf:value "Personal Data" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/6> a resume:SkillItem ;
+    rdf:value "Special Categories of Data" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/7> a resume:SkillItem ;
+    rdf:value "Lawful Basis" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/8> a resume:SkillItem ;
+    rdf:value "Consent" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/16/item/9> a resume:SkillItem ;
+    rdf:value "Explicit Consent" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17> a resume:SkillDetail ;
+    resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/17/item/0>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/1>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/10>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/11>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/12>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/13>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/14>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/15>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/16>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/17>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/18>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/19>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/2>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/20>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/21>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/22>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/23>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/24>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/25>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/26>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/27>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/28>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/29>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/3>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/30>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/31>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/32>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/33>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/34>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/35>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/36>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/4>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/5>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/6>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/7>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/8>,
+        <https://example.org/resume/dooa-ansari/skill-detail/17/item/9> ;
+    schema:name "AI" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/0> a resume:SkillItem ;
+    rdf:value "Prompt Engineering" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/1> a resume:SkillItem ;
+    rdf:value "Large Language Models (LLMs)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/10> a resume:SkillItem ;
+    rdf:value "LlamaIndex" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/11> a resume:SkillItem ;
+    rdf:value "CrewAI" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/12> a resume:SkillItem ;
+    rdf:value "AutoGen" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/13> a resume:SkillItem ;
+    rdf:value "DSPy" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/14> a resume:SkillItem ;
+    rdf:value "OpenAI API" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/15> a resume:SkillItem ;
+    rdf:value "Anthropic Claude API" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/16> a resume:SkillItem ;
+    rdf:value "Hugging Face Transformers" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/17> a resume:SkillItem ;
+    rdf:value "PyTorch" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/18> a resume:SkillItem ;
+    rdf:value "TensorFlow" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/19> a resume:SkillItem ;
+    rdf:value "LangGraph" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/2> a resume:SkillItem ;
+    rdf:value "Retrieval-Augmented Generation (RAG)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/20> a resume:SkillItem ;
+    rdf:value "LangSmith" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/21> a resume:SkillItem ;
+    rdf:value "Cursor" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/22> a resume:SkillItem ;
+    rdf:value "Windsurf" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/23> a resume:SkillItem ;
+    rdf:value "GitHub Copilot" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/24> a resume:SkillItem ;
+    rdf:value "Claude Code" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/25> a resume:SkillItem ;
+    rdf:value "Ollama" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/26> a resume:SkillItem ;
+    rdf:value "vLLM" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/27> a resume:SkillItem ;
+    rdf:value "Llama.cpp" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/28> a resume:SkillItem ;
+    rdf:value "Multi-Agent Systems" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/29> a resume:SkillItem ;
+    rdf:value "AI Agents" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/3> a resume:SkillItem ;
+    rdf:value "Fine-Tuning" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/30> a resume:SkillItem ;
+    rdf:value "Function Calling" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/31> a resume:SkillItem ;
+    rdf:value "Tool Use" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/32> a resume:SkillItem ;
+    rdf:value "Guardrails AI" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/33> a resume:SkillItem ;
+    rdf:value "NeMo Guardrails" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/34> a resume:SkillItem ;
+    rdf:value "Evaluation Frameworks (TruLens" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/35> a resume:SkillItem ;
+    rdf:value "Ragas)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/36> a resume:SkillItem ;
+    rdf:value "MLOps" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/4> a resume:SkillItem ;
+    rdf:value "Vector Databases (Pinecone" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/5> a resume:SkillItem ;
+    rdf:value "Chroma" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/6> a resume:SkillItem ;
+    rdf:value "Milvus" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/7> a resume:SkillItem ;
+    rdf:value "Qdrant)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/8> a resume:SkillItem ;
+    rdf:value "Embeddings" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/17/item/9> a resume:SkillItem ;
     rdf:value "LangChain" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/2> a resume:SkillDetail ;
@@ -1826,124 +2442,168 @@
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/34>,
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/35>,
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/36>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/37>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/38>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/39>,
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/4>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/40>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/41>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/42>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/43>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/44>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/45>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/46>,
+        <https://example.org/resume/dooa-ansari/skill-detail/5/item/47>,
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/5/item/9> ;
-    schema:name "GraphQL" .
+    schema:name "REST APIs" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/0> a resume:SkillItem ;
-    rdf:value "GraphQL" .
+    rdf:value "REST" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/1> a resume:SkillItem ;
-    rdf:value "Schema" .
+    rdf:value "HTTP Methods (GET" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/10> a resume:SkillItem ;
-    rdf:value "Enums" .
+    rdf:value "401" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/11> a resume:SkillItem ;
-    rdf:value "Input Objects" .
+    rdf:value "403" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/12> a resume:SkillItem ;
-    rdf:value "Resolvers" .
+    rdf:value "404" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/13> a resume:SkillItem ;
-    rdf:value "Schema Definition Language (SDL)" .
+    rdf:value "500)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/14> a resume:SkillItem ;
-    rdf:value "Introspection" .
+    rdf:value "JSON" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/15> a resume:SkillItem ;
-    rdf:value "Fragments" .
+    rdf:value "XML" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/16> a resume:SkillItem ;
-    rdf:value "Directives" .
+    rdf:value "Endpoints" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/17> a resume:SkillItem ;
-    rdf:value "Arguments" .
+    rdf:value "URI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/18> a resume:SkillItem ;
-    rdf:value "Aliases" .
+    rdf:value "URL" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/19> a resume:SkillItem ;
-    rdf:value "Variables" .
+    rdf:value "Query Parameters" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/2> a resume:SkillItem ;
-    rdf:value "Queries" .
+    rdf:value "POST" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/20> a resume:SkillItem ;
-    rdf:value "Apollo Server" .
+    rdf:value "Path Parameters" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/21> a resume:SkillItem ;
-    rdf:value "Apollo Client" .
+    rdf:value "Headers" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/22> a resume:SkillItem ;
-    rdf:value "Relay" .
+    rdf:value "Bearer Token" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/23> a resume:SkillItem ;
-    rdf:value "Express-GraphQL" .
+    rdf:value "Basic Authentication" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/24> a resume:SkillItem ;
-    rdf:value "GraphiQL" .
+    rdf:value "API Keys" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/25> a resume:SkillItem ;
-    rdf:value "Playground" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/5/item/26> a resume:SkillItem ;
-    rdf:value "N+1 Problem" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/5/item/27> a resume:SkillItem ;
-    rdf:value "DataLoader" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/5/item/28> a resume:SkillItem ;
-    rdf:value "Pagination" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/5/item/29> a resume:SkillItem ;
-    rdf:value "Cursors" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/5/item/3> a resume:SkillItem ;
-    rdf:value "Mutations" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/5/item/30> a resume:SkillItem ;
-    rdf:value "Offset" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/5/item/31> a resume:SkillItem ;
     rdf:value "Rate Limiting" .
 
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/26> a resume:SkillItem ;
+    rdf:value "CORS" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/27> a resume:SkillItem ;
+    rdf:value "Swagger" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/28> a resume:SkillItem ;
+    rdf:value "OpenAPI" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/29> a resume:SkillItem ;
+    rdf:value "Postman" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/3> a resume:SkillItem ;
+    rdf:value "PUT" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/30> a resume:SkillItem ;
+    rdf:value "cURL" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/31> a resume:SkillItem ;
+    rdf:value "Axios" .
+
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/32> a resume:SkillItem ;
-    rdf:value "Complexity Analysis" .
+    rdf:value "Fetch API" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/33> a resume:SkillItem ;
-    rdf:value "Error Handling" .
+    rdf:value "Webhooks" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/34> a resume:SkillItem ;
-    rdf:value "Extensions" .
+    rdf:value "API Gateway" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/35> a resume:SkillItem ;
-    rdf:value "Federation" .
+    rdf:value "Pagination" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/36> a resume:SkillItem ;
-    rdf:value "Stitching" .
+    rdf:value "Filtering" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/37> a resume:SkillItem ;
+    rdf:value "Sorting" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/38> a resume:SkillItem ;
+    rdf:value "Payload" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/39> a resume:SkillItem ;
+    rdf:value "Idempotency" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/4> a resume:SkillItem ;
-    rdf:value "Subscriptions" .
+    rdf:value "PATCH" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/40> a resume:SkillItem ;
+    rdf:value "Microservices" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/41> a resume:SkillItem ;
+    rdf:value "Third-Party Integrations" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/42> a resume:SkillItem ;
+    rdf:value "Payment Gateways (Stripe" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/43> a resume:SkillItem ;
+    rdf:value "PayPal)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/44> a resume:SkillItem ;
+    rdf:value "CRM Integrations (Salesforce" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/45> a resume:SkillItem ;
+    rdf:value "HubSpot)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/46> a resume:SkillItem ;
+    rdf:value "ERP Integration" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/5/item/47> a resume:SkillItem ;
+    rdf:value "API Versioning" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/5> a resume:SkillItem ;
-    rdf:value "Types" .
+    rdf:value "DELETE)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/6> a resume:SkillItem ;
-    rdf:value "Scalar Types" .
+    rdf:value "Status Codes (200" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/7> a resume:SkillItem ;
-    rdf:value "Object Types" .
+    rdf:value "201" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/8> a resume:SkillItem ;
-    rdf:value "Interfaces" .
+    rdf:value "204" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/5/item/9> a resume:SkillItem ;
-    rdf:value "Unions" .
+    rdf:value "400" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/6/item/0>,
@@ -1977,176 +2637,124 @@
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/34>,
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/35>,
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/36>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/37>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/38>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/39>,
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/4>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/40>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/41>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/42>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/43>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/44>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/45>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/46>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/47>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/48>,
-        <https://example.org/resume/dooa-ansari/skill-detail/6/item/49>,
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/6/item/9> ;
-    schema:name "NodeJS" .
+    schema:name "GraphQL" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/0> a resume:SkillItem ;
-    rdf:value "Node.js" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/1> a resume:SkillItem ;
-    rdf:value "JavaScript" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/10> a resume:SkillItem ;
-    rdf:value "Microtask Queue" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/11> a resume:SkillItem ;
-    rdf:value "CommonJS" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/12> a resume:SkillItem ;
-    rdf:value "ES Modules (ESM)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/13> a resume:SkillItem ;
-    rdf:value "npm" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/14> a resume:SkillItem ;
-    rdf:value "yarn" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/15> a resume:SkillItem ;
-    rdf:value "pnpm" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/16> a resume:SkillItem ;
-    rdf:value "package.json" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/17> a resume:SkillItem ;
-    rdf:value "node\\_modules" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/18> a resume:SkillItem ;
-    rdf:value "Express.js" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/19> a resume:SkillItem ;
-    rdf:value "NestJS" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/2> a resume:SkillItem ;
-    rdf:value "TypeScript" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/20> a resume:SkillItem ;
-    rdf:value "Fastify" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/21> a resume:SkillItem ;
-    rdf:value "Koa" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/22> a resume:SkillItem ;
-    rdf:value "REST APIs" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/23> a resume:SkillItem ;
     rdf:value "GraphQL" .
 
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/1> a resume:SkillItem ;
+    rdf:value "Schema" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/10> a resume:SkillItem ;
+    rdf:value "Enums" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/11> a resume:SkillItem ;
+    rdf:value "Input Objects" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/12> a resume:SkillItem ;
+    rdf:value "Resolvers" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/13> a resume:SkillItem ;
+    rdf:value "Schema Definition Language (SDL)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/14> a resume:SkillItem ;
+    rdf:value "Introspection" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/15> a resume:SkillItem ;
+    rdf:value "Fragments" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/16> a resume:SkillItem ;
+    rdf:value "Directives" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/17> a resume:SkillItem ;
+    rdf:value "Arguments" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/18> a resume:SkillItem ;
+    rdf:value "Aliases" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/19> a resume:SkillItem ;
+    rdf:value "Variables" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/2> a resume:SkillItem ;
+    rdf:value "Queries" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/20> a resume:SkillItem ;
+    rdf:value "Apollo Server" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/21> a resume:SkillItem ;
+    rdf:value "Apollo Client" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/22> a resume:SkillItem ;
+    rdf:value "Relay" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/6/item/23> a resume:SkillItem ;
+    rdf:value "Express-GraphQL" .
+
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/24> a resume:SkillItem ;
-    rdf:value "WebSockets" .
+    rdf:value "GraphiQL" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/25> a resume:SkillItem ;
-    rdf:value "Socket.io" .
+    rdf:value "Playground" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/26> a resume:SkillItem ;
-    rdf:value "File System (fs)" .
+    rdf:value "N+1 Problem" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/27> a resume:SkillItem ;
-    rdf:value "Path (path)" .
+    rdf:value "DataLoader" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/28> a resume:SkillItem ;
-    rdf:value "Events" .
+    rdf:value "Pagination" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/29> a resume:SkillItem ;
-    rdf:value "Streams" .
+    rdf:value "Cursors" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/3> a resume:SkillItem ;
-    rdf:value "V8 Engine" .
+    rdf:value "Mutations" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/30> a resume:SkillItem ;
-    rdf:value "Buffers" .
+    rdf:value "Offset" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/31> a resume:SkillItem ;
-    rdf:value "Worker Threads" .
+    rdf:value "Rate Limiting" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/32> a resume:SkillItem ;
-    rdf:value "Child Processes" .
+    rdf:value "Complexity Analysis" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/33> a resume:SkillItem ;
-    rdf:value "Cluster Module" .
+    rdf:value "Error Handling" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/34> a resume:SkillItem ;
-    rdf:value "Environment Variables (dotenv)" .
+    rdf:value "Extensions" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/35> a resume:SkillItem ;
-    rdf:value "JWT" .
+    rdf:value "Federation" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/36> a resume:SkillItem ;
-    rdf:value "bcrypt" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/37> a resume:SkillItem ;
-    rdf:value "Passport.js" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/38> a resume:SkillItem ;
-    rdf:value "CORS" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/39> a resume:SkillItem ;
-    rdf:value "Helmet" .
+    rdf:value "Stitching" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/4> a resume:SkillItem ;
-    rdf:value "Event Loop" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/40> a resume:SkillItem ;
-    rdf:value "Jest" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/41> a resume:SkillItem ;
-    rdf:value "Mocha" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/42> a resume:SkillItem ;
-    rdf:value "Chai" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/43> a resume:SkillItem ;
-    rdf:value "Supertest" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/44> a resume:SkillItem ;
-    rdf:value "PM2" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/45> a resume:SkillItem ;
-    rdf:value "Nodemon" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/46> a resume:SkillItem ;
-    rdf:value "Docker" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/47> a resume:SkillItem ;
-    rdf:value "CI/CD" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/48> a resume:SkillItem ;
-    rdf:value "Microservices" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/6/item/49> a resume:SkillItem ;
-    rdf:value "Async/Await" .
+    rdf:value "Subscriptions" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/5> a resume:SkillItem ;
-    rdf:value "Libuv" .
+    rdf:value "Types" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/6> a resume:SkillItem ;
-    rdf:value "Asynchronous I/O" .
+    rdf:value "Scalar Types" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/7> a resume:SkillItem ;
-    rdf:value "Non-blocking I/O" .
+    rdf:value "Object Types" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/8> a resume:SkillItem ;
-    rdf:value "Call Stack" .
+    rdf:value "Interfaces" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/6/item/9> a resume:SkillItem ;
-    rdf:value "Callback Queue" .
+    rdf:value "Unions" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/7/item/0>,
@@ -2182,130 +2790,170 @@
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/36>,
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/37>,
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/38>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/39>,
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/4>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/40>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/41>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/42>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/43>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/44>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/45>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/46>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/47>,
+        <https://example.org/resume/dooa-ansari/skill-detail/7/item/48>,
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/7/item/9> ;
-    schema:name "Django" .
+    schema:name "ReactJS" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/0> a resume:SkillItem ;
-    rdf:value "python" .
+    rdf:value "ReactJS" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/1> a resume:SkillItem ;
-    rdf:value "Django" .
+    rdf:value "JavaScript" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/10> a resume:SkillItem ;
-    rdf:value "Migrations" .
+    rdf:value "Hooks" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/11> a resume:SkillItem ;
-    rdf:value "QuerySets" .
+    rdf:value "useState" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/12> a resume:SkillItem ;
-    rdf:value "Admin Interface" .
+    rdf:value "useEffect" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/13> a resume:SkillItem ;
-    rdf:value "Authentication" .
+    rdf:value "useContext" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/14> a resume:SkillItem ;
-    rdf:value "Authorization" .
+    rdf:value "useReducer" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/15> a resume:SkillItem ;
-    rdf:value "Sessions" .
+    rdf:value "useRef" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/16> a resume:SkillItem ;
-    rdf:value "Cookies" .
+    rdf:value "useMemo" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/17> a resume:SkillItem ;
-    rdf:value "Middleware" .
+    rdf:value "useCallback" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/18> a resume:SkillItem ;
-    rdf:value "Signals" .
+    rdf:value "Custom Hooks" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/19> a resume:SkillItem ;
-    rdf:value "Management Commands" .
+    rdf:value "React Router" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/2> a resume:SkillItem ;
-    rdf:value "Django REST Framework (DRF)" .
+    rdf:value "TypeScript" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/20> a resume:SkillItem ;
-    rdf:value "Serializers" .
+    rdf:value "Context API" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/21> a resume:SkillItem ;
-    rdf:value "ViewSets" .
+    rdf:value "Redux" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/22> a resume:SkillItem ;
-    rdf:value "Routers" .
+    rdf:value "Redux Toolkit" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/23> a resume:SkillItem ;
-    rdf:value "JWT Authentication" .
+    rdf:value "Zustand" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/24> a resume:SkillItem ;
-    rdf:value "OAuth2" .
+    rdf:value "TanStack Query" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/25> a resume:SkillItem ;
-    rdf:value "Redis" .
+    rdf:value "Axios" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/26> a resume:SkillItem ;
-    rdf:value "Channels" .
+    rdf:value "Fetch API" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/27> a resume:SkillItem ;
-    rdf:value "WebSockets" .
+    rdf:value "Tailwind CSS" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/28> a resume:SkillItem ;
-    rdf:value "Pytest" .
+    rdf:value "Styled Components" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/29> a resume:SkillItem ;
-    rdf:value "Django Test Runner" .
+    rdf:value "CSS Modules" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/3> a resume:SkillItem ;
-    rdf:value "MVT Architecture" .
+    rdf:value "JSX" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/30> a resume:SkillItem ;
-    rdf:value "Nginx" .
+    rdf:value "Material-UI (MUI)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/31> a resume:SkillItem ;
-    rdf:value "PostgreSQL" .
+    rdf:value "Shadcn UI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/32> a resume:SkillItem ;
-    rdf:value "SQLite" .
+    rdf:value "Vite" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/33> a resume:SkillItem ;
-    rdf:value "MySQL" .
+    rdf:value "Webpack" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/34> a resume:SkillItem ;
-    rdf:value "Docker" .
+    rdf:value "Babel" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/35> a resume:SkillItem ;
-    rdf:value "pip" .
+    rdf:value "Jest" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/36> a resume:SkillItem ;
-    rdf:value "settings.py" .
+    rdf:value "React Testing Library" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/37> a resume:SkillItem ;
-    rdf:value "WSGI" .
+    rdf:value "Cypress" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/38> a resume:SkillItem ;
-    rdf:value "ASGI" .
+    rdf:value "Playwright" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/39> a resume:SkillItem ;
+    rdf:value "Next.js" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/4> a resume:SkillItem ;
-    rdf:value "Models" .
+    rdf:value "Virtual DOM" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/40> a resume:SkillItem ;
+    rdf:value "Server-Side Rendering (SSR)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/41> a resume:SkillItem ;
+    rdf:value "Static Site Generation (SSG)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/42> a resume:SkillItem ;
+    rdf:value "Client-Side Rendering (CSR)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/43> a resume:SkillItem ;
+    rdf:value "App Router" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/44> a resume:SkillItem ;
+    rdf:value "Pages Router" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/45> a resume:SkillItem ;
+    rdf:value "Vercel" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/46> a resume:SkillItem ;
+    rdf:value "Netlify" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/47> a resume:SkillItem ;
+    rdf:value "ESLint" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/7/item/48> a resume:SkillItem ;
+    rdf:value "Prettier" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/5> a resume:SkillItem ;
-    rdf:value "Views" .
+    rdf:value "Components" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/6> a resume:SkillItem ;
-    rdf:value "Templates" .
+    rdf:value "Functional Components" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/7> a resume:SkillItem ;
-    rdf:value "Forms" .
+    rdf:value "Class Components" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/8> a resume:SkillItem ;
-    rdf:value "ModelForms" .
+    rdf:value "Props" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/7/item/9> a resume:SkillItem ;
-    rdf:value "Django ORM" .
+    rdf:value "State" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/8/item/0>,
@@ -2346,141 +2994,169 @@
         <https://example.org/resume/dooa-ansari/skill-detail/8/item/40>,
         <https://example.org/resume/dooa-ansari/skill-detail/8/item/41>,
         <https://example.org/resume/dooa-ansari/skill-detail/8/item/42>,
+        <https://example.org/resume/dooa-ansari/skill-detail/8/item/43>,
+        <https://example.org/resume/dooa-ansari/skill-detail/8/item/44>,
+        <https://example.org/resume/dooa-ansari/skill-detail/8/item/45>,
+        <https://example.org/resume/dooa-ansari/skill-detail/8/item/46>,
+        <https://example.org/resume/dooa-ansari/skill-detail/8/item/47>,
+        <https://example.org/resume/dooa-ansari/skill-detail/8/item/48>,
+        <https://example.org/resume/dooa-ansari/skill-detail/8/item/49>,
         <https://example.org/resume/dooa-ansari/skill-detail/8/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/8/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/8/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/8/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/8/item/9> ;
-    schema:name "NextJS" .
+    schema:name "NodeJS" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/0> a resume:SkillItem ;
-    rdf:value "Next.js" .
+    rdf:value "Node.js" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/1> a resume:SkillItem ;
-    rdf:value "React" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/10> a resume:SkillItem ;
-    rdf:value "Dynamic Routes" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/11> a resume:SkillItem ;
-    rdf:value "Catch-all Routes" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/12> a resume:SkillItem ;
-    rdf:value "Parallel Routes" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/13> a resume:SkillItem ;
-    rdf:value "Intercepting Routes" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/14> a resume:SkillItem ;
-    rdf:value "Middleware" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/15> a resume:SkillItem ;
-    rdf:value "Server-Side Rendering (SSR)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/16> a resume:SkillItem ;
-    rdf:value "Static Site Generation (SSG)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/17> a resume:SkillItem ;
-    rdf:value "Incremental Static Regeneration (ISR)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/18> a resume:SkillItem ;
-    rdf:value "Client-Side Rendering (CSR)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/19> a resume:SkillItem ;
-    rdf:value "next/image" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/2> a resume:SkillItem ;
     rdf:value "JavaScript" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/20> a resume:SkillItem ;
-    rdf:value "next/font" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/10> a resume:SkillItem ;
+    rdf:value "Microtask Queue" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/21> a resume:SkillItem ;
-    rdf:value "next/link" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/11> a resume:SkillItem ;
+    rdf:value "CommonJS" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/22> a resume:SkillItem ;
-    rdf:value "next/script" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/12> a resume:SkillItem ;
+    rdf:value "ES Modules (ESM)" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/23> a resume:SkillItem ;
-    rdf:value "Vercel" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/13> a resume:SkillItem ;
+    rdf:value "npm" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/24> a resume:SkillItem ;
-    rdf:value "Turbopack" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/14> a resume:SkillItem ;
+    rdf:value "yarn" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/25> a resume:SkillItem ;
-    rdf:value "Webpack" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/15> a resume:SkillItem ;
+    rdf:value "pnpm" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/26> a resume:SkillItem ;
-    rdf:value "API Routes" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/16> a resume:SkillItem ;
+    rdf:value "package.json" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/27> a resume:SkillItem ;
-    rdf:value "Hydration" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/17> a resume:SkillItem ;
+    rdf:value "node\\_modules" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/28> a resume:SkillItem ;
-    rdf:value "Streaming" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/18> a resume:SkillItem ;
+    rdf:value "Express.js" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/29> a resume:SkillItem ;
-    rdf:value "Suspense" .
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/19> a resume:SkillItem ;
+    rdf:value "NestJS" .
 
-<https://example.org/resume/dooa-ansari/skill-detail/8/item/3> a resume:SkillItem ;
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/2> a resume:SkillItem ;
     rdf:value "TypeScript" .
 
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/20> a resume:SkillItem ;
+    rdf:value "Fastify" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/21> a resume:SkillItem ;
+    rdf:value "Koa" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/22> a resume:SkillItem ;
+    rdf:value "REST APIs" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/23> a resume:SkillItem ;
+    rdf:value "GraphQL" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/24> a resume:SkillItem ;
+    rdf:value "WebSockets" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/25> a resume:SkillItem ;
+    rdf:value "Socket.io" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/26> a resume:SkillItem ;
+    rdf:value "File System (fs)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/27> a resume:SkillItem ;
+    rdf:value "Path (path)" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/28> a resume:SkillItem ;
+    rdf:value "Events" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/29> a resume:SkillItem ;
+    rdf:value "Streams" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/3> a resume:SkillItem ;
+    rdf:value "V8 Engine" .
+
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/30> a resume:SkillItem ;
-    rdf:value "Metadata API" .
+    rdf:value "Buffers" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/31> a resume:SkillItem ;
-    rdf:value "Open Graph" .
+    rdf:value "Worker Threads" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/32> a resume:SkillItem ;
-    rdf:value "Sitemap Generation" .
+    rdf:value "Child Processes" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/33> a resume:SkillItem ;
-    rdf:value "next.config.js" .
+    rdf:value "Cluster Module" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/34> a resume:SkillItem ;
-    rdf:value "next-auth" .
+    rdf:value "Environment Variables (dotenv)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/35> a resume:SkillItem ;
-    rdf:value "Auth.js" .
+    rdf:value "JWT" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/36> a resume:SkillItem ;
-    rdf:value "Prisma" .
+    rdf:value "bcrypt" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/37> a resume:SkillItem ;
-    rdf:value "Drizzle ORM" .
+    rdf:value "Passport.js" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/38> a resume:SkillItem ;
-    rdf:value "Tailwind CSS" .
+    rdf:value "CORS" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/39> a resume:SkillItem ;
-    rdf:value "Jest" .
+    rdf:value "Helmet" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/4> a resume:SkillItem ;
-    rdf:value "App Router" .
+    rdf:value "Event Loop" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/40> a resume:SkillItem ;
-    rdf:value "Playwright" .
+    rdf:value "Jest" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/41> a resume:SkillItem ;
-    rdf:value "Cypress" .
+    rdf:value "Mocha" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/42> a resume:SkillItem ;
-    rdf:value "Lighthouse" .
+    rdf:value "Chai" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/43> a resume:SkillItem ;
+    rdf:value "Supertest" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/44> a resume:SkillItem ;
+    rdf:value "PM2" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/45> a resume:SkillItem ;
+    rdf:value "Nodemon" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/46> a resume:SkillItem ;
+    rdf:value "Docker" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/47> a resume:SkillItem ;
+    rdf:value "CI/CD" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/48> a resume:SkillItem ;
+    rdf:value "Microservices" .
+
+<https://example.org/resume/dooa-ansari/skill-detail/8/item/49> a resume:SkillItem ;
+    rdf:value "Async/Await" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/5> a resume:SkillItem ;
-    rdf:value "Pages Router" .
+    rdf:value "Libuv" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/6> a resume:SkillItem ;
-    rdf:value "Server Components (RSC)" .
+    rdf:value "Asynchronous I/O" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/7> a resume:SkillItem ;
-    rdf:value "Client Components" .
+    rdf:value "Non-blocking I/O" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/8> a resume:SkillItem ;
-    rdf:value "Server Actions" .
+    rdf:value "Call Stack" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/8/item/9> a resume:SkillItem ;
-    rdf:value "Route Handlers" .
+    rdf:value "Callback Queue" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9> a resume:SkillDetail ;
     resume:hasSkillItem <https://example.org/resume/dooa-ansari/skill-detail/9/item/0>,
@@ -2516,168 +3192,128 @@
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/36>,
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/37>,
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/38>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/39>,
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/4>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/40>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/41>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/42>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/43>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/44>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/45>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/46>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/47>,
-        <https://example.org/resume/dooa-ansari/skill-detail/9/item/48>,
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/5>,
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/6>,
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/7>,
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/8>,
         <https://example.org/resume/dooa-ansari/skill-detail/9/item/9> ;
-    schema:name "TypeScript" .
+    schema:name "Django" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/0> a resume:SkillItem ;
-    rdf:value "TypeScript" .
+    rdf:value "python" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/1> a resume:SkillItem ;
-    rdf:value "JavaScript" .
+    rdf:value "Django" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/10> a resume:SkillItem ;
-    rdf:value "Literal Types" .
+    rdf:value "Migrations" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/11> a resume:SkillItem ;
-    rdf:value "Tuple Types" .
+    rdf:value "QuerySets" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/12> a resume:SkillItem ;
-    rdf:value "Enums" .
+    rdf:value "Admin Interface" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/13> a resume:SkillItem ;
-    rdf:value "Const Enums" .
+    rdf:value "Authentication" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/14> a resume:SkillItem ;
-    rdf:value "Generics" .
+    rdf:value "Authorization" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/15> a resume:SkillItem ;
-    rdf:value "Type Guards" .
+    rdf:value "Sessions" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/16> a resume:SkillItem ;
-    rdf:value "Type Assertions" .
+    rdf:value "Cookies" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/17> a resume:SkillItem ;
-    rdf:value "Type Narrowing" .
+    rdf:value "Middleware" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/18> a resume:SkillItem ;
-    rdf:value "Discriminated Unions" .
+    rdf:value "Signals" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/19> a resume:SkillItem ;
-    rdf:value "Utility Types (Partial" .
+    rdf:value "Management Commands" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/2> a resume:SkillItem ;
-    rdf:value "Type System" .
+    rdf:value "Django REST Framework (DRF)" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/20> a resume:SkillItem ;
-    rdf:value "Required" .
+    rdf:value "Serializers" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/21> a resume:SkillItem ;
-    rdf:value "Readonly" .
+    rdf:value "ViewSets" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/22> a resume:SkillItem ;
-    rdf:value "Record" .
+    rdf:value "Routers" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/23> a resume:SkillItem ;
-    rdf:value "Pick" .
+    rdf:value "JWT Authentication" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/24> a resume:SkillItem ;
-    rdf:value "Omit" .
+    rdf:value "OAuth2" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/25> a resume:SkillItem ;
-    rdf:value "Extract" .
+    rdf:value "Redis" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/26> a resume:SkillItem ;
-    rdf:value "Exclude" .
+    rdf:value "Channels" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/27> a resume:SkillItem ;
-    rdf:value "NonNullable" .
+    rdf:value "WebSockets" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/28> a resume:SkillItem ;
-    rdf:value "ReturnType" .
+    rdf:value "Pytest" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/29> a resume:SkillItem ;
-    rdf:value "Parameters)" .
+    rdf:value "Django Test Runner" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/3> a resume:SkillItem ;
-    rdf:value "Static Typing" .
+    rdf:value "MVT Architecture" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/30> a resume:SkillItem ;
-    rdf:value "Conditional Types" .
+    rdf:value "Nginx" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/31> a resume:SkillItem ;
-    rdf:value "Mapped Types" .
+    rdf:value "PostgreSQL" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/32> a resume:SkillItem ;
-    rdf:value "Template Literal Types" .
+    rdf:value "SQLite" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/33> a resume:SkillItem ;
-    rdf:value "Index Signatures" .
+    rdf:value "MySQL" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/34> a resume:SkillItem ;
-    rdf:value "Keyof Operator" .
+    rdf:value "Docker" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/35> a resume:SkillItem ;
-    rdf:value "Typeof Operator" .
+    rdf:value "pip" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/36> a resume:SkillItem ;
-    rdf:value "any" .
+    rdf:value "settings.py" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/37> a resume:SkillItem ;
-    rdf:value "unknown" .
+    rdf:value "WSGI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/38> a resume:SkillItem ;
-    rdf:value "never" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/39> a resume:SkillItem ;
-    rdf:value "void" .
+    rdf:value "ASGI" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/4> a resume:SkillItem ;
-    rdf:value "Type Inference" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/40> a resume:SkillItem ;
-    rdf:value "Modules" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/41> a resume:SkillItem ;
-    rdf:value "Namespaces" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/42> a resume:SkillItem ;
-    rdf:value "Decorators" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/43> a resume:SkillItem ;
-    rdf:value "Declaration Files (.d.ts)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/44> a resume:SkillItem ;
-    rdf:value "tsconfig.json" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/45> a resume:SkillItem ;
-    rdf:value "tsc (TypeScript Compiler)" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/46> a resume:SkillItem ;
-    rdf:value "Strict Mode" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/47> a resume:SkillItem ;
-    rdf:value "ESLint" .
-
-<https://example.org/resume/dooa-ansari/skill-detail/9/item/48> a resume:SkillItem ;
-    rdf:value "Prettier" .
+    rdf:value "Models" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/5> a resume:SkillItem ;
-    rdf:value "Type Annotations" .
+    rdf:value "Views" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/6> a resume:SkillItem ;
-    rdf:value "Interfaces" .
+    rdf:value "Templates" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/7> a resume:SkillItem ;
-    rdf:value "Type Aliases" .
+    rdf:value "Forms" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/8> a resume:SkillItem ;
-    rdf:value "Union Types" .
+    rdf:value "ModelForms" .
 
 <https://example.org/resume/dooa-ansari/skill-detail/9/item/9> a resume:SkillItem ;
-    rdf:value "Intersection Types" .
+    rdf:value "Django ORM" .
 
