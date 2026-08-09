@@ -1,6 +1,6 @@
 # Django RDF Semantic Resume Agent 🧠🕸️
 
-A lightweight Django service that combines **RDF/Turtle (.ttl)** data modeling, local **SPARQL** querying via `rdflib`, and session-aware **RAG** through **ChromaDB**, **LangGraph**, and **OpenRouter**.
+A lightweight Django service that combines **RDF/Turtle (.ttl)** data modeling and session-aware **RAG** through **ChromaDB**, **LangGraph**, and **OpenRouter**.
 
 Instead of dumping raw documents or bloated text chunks into an LLM context window, this project uses the RDF graph as a precise source of structured resume data and provides a session-aware vector RAG API for grounded answers.
 
@@ -53,17 +53,14 @@ personal-knowledge-graph/
     ├── views.py               # API endpoints + system prompts
     ├── urls.py                # API URL routing
 │   ├── serializers.py         # DRF serializers for Swagger
-│   ├── tests.py               # 57 unit tests
+│   ├── tests.py               # 32 unit tests
     └── services/
         ├── rdf_converter.py   # Resume markdown → RDF converter
         ├── openrouter_service.py  # OpenRouter LLM client
-        ├── sparql_service.py  # SPARQL query execution engine
-        ├── langgraph_service.py   # LangGraph conversational search
         ├── rag_langgraph_service.py # Session-aware RAG workflow + query rewriting
         ├── rag_indexer.py         # RDF entities → contextual vector chunks
         ├── vector_search_service.py # ChromaDB semantic retrieval
         ├── rag_answer_service.py   # Stateless grounded RAG orchestration
-        ├── simple_search_service.py  # Stateless one-shot search
         └── model_config.py    # Central model configuration (single source of truth)
 ```
 
@@ -217,7 +214,7 @@ The rewrite node is an LLM call, but it uses the existing configured model. It i
 
 ## 🧪 Testing
 
-Run the full test suite (57 tests):
+Run the full test suite (32 tests):
 
 ```bash
 python3 manage.py test resume_api -v 2
@@ -230,10 +227,6 @@ python3 manage.py test resume_api -v 2
 | `RDFConverterServiceTests` | 11 | RDF converter parsing functions |
 | `ResumeApiEndpointTests` | 6 | Convert-resume endpoint |
 | `OpenRouterServiceTests` | 4 | OpenRouter API client |
-| `SparqlServiceTests` | 6 | SPARQL execution engine |
-| `LangGraphServiceTests` | 3 | LangGraph conversational search service |
-| `SimpleSearchServiceTests` | 3 | Stateless one-shot search service |
-| `SimpleSearchEndpointTests` | 6 | Stateless search endpoint |
 | `SwaggerEndpointTests` | 4 | Swagger/ReDoc documentation |
 | `RagSearchEndpointTests` | 4 | Session-aware RAG API validation |
 | `RagLangGraphServiceTests` | 2 | Query rewriting, retrieval, and session history |
