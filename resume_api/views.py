@@ -1,68 +1,16 @@
+"""Thin views that delegate to use cases via the dependency injection container."""
+
 import uuid
 from pathlib import Path
 
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .serializers import RagSearchSerializer
-from .services.rdf_converter import convert_resume_to_rdf
+from .interfaces.schemas import success_response, error_response, rag_success_response
+from .interfaces.container import container
 from .services.rag_langgraph_service import search_rag_with_context
-
-# Swagger response schema
-success_response = openapi.Response(
-    description="RDF file generated successfully",
-    schema=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "message": openapi.Schema(type=openapi.TYPE_STRING, description="Success message"),
-            "source_file": openapi.Schema(type=openapi.TYPE_STRING, description="Path to source markdown file"),
-            "rdf_file": openapi.Schema(type=openapi.TYPE_STRING, description="Path to generated RDF file"),
-        },
-    ),
-)
-
-error_response = openapi.Response(
-    description="Error occurred",
-    schema=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "error": openapi.Schema(type=openapi.TYPE_STRING, description="Error message"),
-        },
-    ),
-)
-
-rag_chunk_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        "document": openapi.Schema(type=openapi.TYPE_STRING),
-        "metadata": openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            additional_properties=openapi.Schema(type=openapi.TYPE_STRING),
-        ),
-        "distance": openapi.Schema(type=openapi.TYPE_NUMBER, format="double"),
-        "score": openapi.Schema(type=openapi.TYPE_NUMBER, format="double"),
-    },
-)
-
-rag_success_response = openapi.Response(
-    description="Grounded RAG answer",
-    schema=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "prompt": openapi.Schema(type=openapi.TYPE_STRING),
-            "session_id": openapi.Schema(type=openapi.TYPE_STRING),
-            "model": openapi.Schema(type=openapi.TYPE_STRING),
-            "retrieval_query": openapi.Schema(type=openapi.TYPE_STRING),
-            "answer": openapi.Schema(type=openapi.TYPE_STRING),
-            "retrieved_chunks": openapi.Schema(
-                type=openapi.TYPE_ARRAY,
-                items=rag_chunk_schema,
-            ),
-        },
-    ),
-)
 
 
 @swagger_auto_schema(
@@ -81,7 +29,6 @@ def convert_resume(request):
     Endpoint that reads the 'All Details Resume.md' file, converts it to RDF,
     and writes the .ttl file in the same directory as the source file.
     """
-    # Path to the resume markdown file (project root)
     md_path = Path(__file__).resolve().parent.parent / "All Details Resume.md"
 
     if not md_path.exists():
@@ -91,7 +38,8 @@ def convert_resume(request):
         )
 
     try:
-        output_path = convert_resume_to_rdf(str(md_path))
+        use_case = container.convert_resume_use_case
+        output_path = use_case.execute(str(md_path))
         return Response(
             {
                 "message": "RDF file generated successfully.",

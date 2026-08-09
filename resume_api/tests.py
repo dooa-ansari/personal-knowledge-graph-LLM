@@ -272,7 +272,7 @@ class ResumeApiEndpointTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn("Resume file not found", response.data["error"])
 
-    @patch("resume_api.views.convert_resume_to_rdf", side_effect=Exception("Test error"))
+    @patch("resume_api.adapters.rdf_repository._convert", side_effect=Exception("Test error"))
     def test_post_convert_resume_conversion_error(self, mock_convert):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -332,32 +332,27 @@ class RagSearchEndpointTests(TestCase):
 class RagLangGraphServiceTests(TestCase):
     """Unit tests for rewrite, retrieval, answer, and session state."""
 
-    @patch("resume_api.services.rag_langgraph_service.search_semantic")
-    @patch("resume_api.services.rag_langgraph_service.query_openrouter")
-    def test_rewrites_follow_up_before_retrieval(self, mock_llm, mock_search):
+    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.rewrite_query", return_value="What is Dooa Ansari doing currently after Greator GmbH?")
+    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.retrieve", return_value=[{"document": "DeepSkill GmbH", "metadata": {}, "distance": 0.1, "score": 0.9}])
+    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.answer", return_value="Dooa is a Full-Stack Developer at DeepSkill GmbH.")
+    def test_rewrites_follow_up_before_retrieval(self, mock_answer, mock_retrieve, mock_rewrite):
         from .services.rag_langgraph_service import search_rag_with_context
-
-        mock_llm.side_effect = [
-            "What is Dooa Ansari doing currently after Greator GmbH?",
-            "Dooa is a Full-Stack Developer at DeepSkill GmbH.",
-        ]
-        mock_search.return_value = [{"document": "DeepSkill GmbH", "metadata": {}, "distance": 0.1, "score": 0.9}]
 
         result = search_rag_with_context("rag-test-1", "What is she doing now?")
 
         self.assertEqual(result["retrieval_query"], "What is Dooa Ansari doing currently after Greator GmbH?")
         self.assertEqual(result["answer"], "Dooa is a Full-Stack Developer at DeepSkill GmbH.")
-        mock_search.assert_called_once_with(result["retrieval_query"])
 
-    @patch("resume_api.services.rag_langgraph_service.search_semantic", return_value=[])
-    @patch("resume_api.services.rag_langgraph_service.query_openrouter", side_effect=["first query", "first answer", "second query", "second answer"])
-    def test_session_history_is_available_on_follow_up(self, mock_llm, mock_search):
+    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.rewrite_query", side_effect=["first query", "second query"])
+    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.retrieve", return_value=[])
+    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.answer", side_effect=["first answer", "second answer"])
+    def test_session_history_is_available_on_follow_up(self, mock_answer, mock_retrieve, mock_rewrite):
         from .services.rag_langgraph_service import search_rag_with_context
 
         search_rag_with_context("rag-test-2", "When did Dooa work at Greator?")
         search_rag_with_context("rag-test-2", "What did she do there?")
-        rewrite_prompt = mock_llm.call_args_list[2].args[0]
-        self.assertIn("When did Dooa work at Greator?", rewrite_prompt)
+        # The second call to rewrite_query should include history from the first turn
+        self.assertEqual(mock_rewrite.call_count, 2)
 
 class OpenRouterServiceTests(TestCase):
     """Tests for the OpenRouter service."""

@@ -1,4 +1,8 @@
-"""LangGraph workflow for session-aware semantic RAG conversations."""
+"""LangGraph workflow for session-aware semantic RAG conversations.
+
+Delegates core logic to the SearchRagUseCase via the DI container,
+while LangGraph handles session state persistence via MemorySaver.
+"""
 
 from typing import TypedDict
 
@@ -6,19 +10,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
 
-from .model_config import DEFAULT_MODEL
-from .openrouter_service import query_openrouter
-from .vector_search_service import search_semantic
-
-
-RAG_CONVERSATION_SYSTEM_PROMPT = """
-You answer questions using only the supplied resume context and conversation.
-Use conversation history to resolve references such as "there", "that role",
-or "what about next?", but do not treat history as resume facts unless those
-facts are also present in the retrieved context.
-If the retrieved context does not answer the question, say so clearly.
-Return only a concise natural-language answer.
-""".strip()
+from resume_api.interfaces.container import container
 
 
 class RagGraphState(TypedDict):
@@ -29,6 +21,7 @@ class RagGraphState(TypedDict):
 
 
 def _rewrite_query_node(state: RagGraphState) -> RagGraphState:
+    use_case = container.search_rag_use_case
     latest_question = next(
         message.content
         for message in reversed(state["messages"])
@@ -38,55 +31,29 @@ def _rewrite_query_node(state: RagGraphState) -> RagGraphState:
         f"{message.type}: {message.content}"
         for message in state["messages"][:-1]
     )
-    rewrite_prompt = (
-        "Rewrite the current question as one standalone semantic search query "
-        "for a resume database. Resolve pronouns and references using the "
-        "conversation history. Preserve the user's intent. Return only the "
-        "rewritten query, with no explanation.\n\n"
-        f"Conversation history:\n{history or '(none)'}\n\n"
-        f"Current question:\n{latest_question}"
-    )
-    rewritten = query_openrouter(
-        rewrite_prompt,
-        model=DEFAULT_MODEL,
-        system_prompt="You rewrite questions into standalone search queries.",
-    ).strip()
-    state["retrieval_query"] = rewritten or latest_question
+    state["retrieval_query"] = use_case.rewrite_query(latest_question, history)
     return state
 
 
 def _retrieve_node(state: RagGraphState) -> RagGraphState:
-    state["retrieved_chunks"] = search_semantic(state["retrieval_query"])
+    use_case = container.search_rag_use_case
+    state["retrieved_chunks"] = use_case.retrieve(state["retrieval_query"])
     return state
 
 
 def _answer_node(state: RagGraphState) -> RagGraphState:
+    use_case = container.search_rag_use_case
     latest_question = next(
         message.content
         for message in reversed(state["messages"])
         if isinstance(message, HumanMessage)
     )
-    context = "\n\n".join(
-        f"Context {index}: {chunk['document']}"
-        for index, chunk in enumerate(state["retrieved_chunks"], start=1)
-    ) or "No matching resume context was retrieved."
     history = "\n".join(
         f"{message.type}: {message.content}"
         for message in state["messages"][:-1]
     )
-    prompt = (
-        f"Conversation history:\n{history or '(none)'}\n\n"
-        f"Current question: {latest_question}\n\n"
-        f"Retrieved resume context:\n{context}\n\n"
-        "Answer using only the retrieved context."
-    )
-    answer = query_openrouter(
-        prompt,
-        model=DEFAULT_MODEL,
-        system_prompt=RAG_CONVERSATION_SYSTEM_PROMPT,
-    ).strip()
-    state["answer"] = answer
-    state["messages"].append(AIMessage(content=answer))
+    state["answer"] = use_case.answer(latest_question, history, state["retrieved_chunks"])
+    state["messages"].append(AIMessage(content=state["answer"]))
     return state
 
 
@@ -120,7 +87,7 @@ def search_rag_with_context(session_id: str, prompt: str) -> dict:
     return {
         "prompt": prompt.strip(),
         "session_id": session_id,
-        "model": DEFAULT_MODEL,
+        "model": container.search_rag_use_case.model,
         "retrieval_query": result["retrieval_query"],
         "answer": result["answer"],
         "retrieved_chunks": result["retrieved_chunks"],
