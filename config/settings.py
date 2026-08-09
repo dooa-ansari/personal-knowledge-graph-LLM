@@ -27,13 +27,13 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 
 # RAG configuration. These settings are intentionally added before the RAG
 # implementation so deployment configuration is defined in one place.
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "openai/text-embedding-3-small")
 CHROMA_PERSIST_PATH = os.getenv(
     "CHROMA_PERSIST_PATH", str(BASE_DIR / "data" / "chroma")
 )
 RAG_COLLECTION_NAME = os.getenv("RAG_COLLECTION_NAME", "resume_chunks")
 RAG_TOP_K = int(os.getenv("RAG_TOP_K", "8"))
+CHROMA_ANONYMIZED_TELEMETRY = False
 
 
 # Quick-start development settings - unsuitable for production
