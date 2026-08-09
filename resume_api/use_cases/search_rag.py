@@ -1,6 +1,5 @@
 """Use case for session-aware semantic RAG search."""
 
-from resume_api.domain.entities import RagChunk, RagResult
 from resume_api.ports.repositories import LLMProvider, VectorRepository
 from resume_api.services.model_config import DEFAULT_MODEL
 
@@ -71,35 +70,3 @@ class SearchRagUseCase:
             system_prompt=RAG_CONVERSATION_SYSTEM_PROMPT,
         ).strip()
 
-    def execute(
-        self,
-        session_id: str,
-        prompt: str,
-        messages: list,
-    ) -> RagResult:
-        """Run a full RAG turn: rewrite → retrieve → answer."""
-        latest_question = prompt
-        history = "\n".join(
-            f"{msg.type}: {msg.content}"
-            for msg in messages[:-1]
-        ) if len(messages) > 1 else ""
-
-        retrieval_query = self.rewrite_query(latest_question, history)
-        retrieved_chunks = self.retrieve(retrieval_query)
-        answer = self.answer(latest_question, history, retrieved_chunks)
-
-        return RagResult(
-            prompt=prompt,
-            session_id=session_id,
-            model=DEFAULT_MODEL,
-            retrieval_query=retrieval_query,
-            answer=answer,
-            retrieved_chunks=[
-                RagChunk(
-                    id=chunk.get("id", ""),
-                    document=chunk["document"],
-                    metadata=chunk.get("metadata", {}),
-                )
-                for chunk in retrieved_chunks
-            ],
-        )

@@ -31,12 +31,6 @@ def convert_resume(request):
     """
     md_path = Path(__file__).resolve().parent.parent / "All Details Resume.md"
 
-    if not md_path.exists():
-        return Response(
-            {"error": f"Resume file not found at: {md_path}"},
-            status=404,
-        )
-
     try:
         use_case = container.convert_resume_use_case
         output_path = use_case.execute(str(md_path))

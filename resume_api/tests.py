@@ -266,11 +266,11 @@ class ResumeApiEndpointTests(TestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @patch("resume_api.views.Path.exists", return_value=False)
-    def test_post_convert_resume_file_not_found(self, mock_exists):
+    @patch("resume_api.adapters.rdf_repository._convert", side_effect=FileNotFoundError("Resume file not found"))
+    def test_post_convert_resume_file_not_found(self, mock_convert):
         response = self.client.post(self.url)
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertIn("Resume file not found", response.data["error"])
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("Failed to convert resume to RDF", response.data["error"])
 
     @patch("resume_api.adapters.rdf_repository._convert", side_effect=Exception("Test error"))
     def test_post_convert_resume_conversion_error(self, mock_convert):

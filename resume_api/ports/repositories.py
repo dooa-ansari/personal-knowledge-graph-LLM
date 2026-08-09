@@ -1,9 +1,6 @@
 """Repository port interfaces for dependency inversion."""
 
 from abc import ABC, abstractmethod
-from typing import Optional
-
-from resume_api.domain.entities import RagChunk
 
 
 class VectorRepository(ABC):
@@ -40,18 +37,4 @@ class RDFRepository(ABC):
     @abstractmethod
     def convert_resume_to_rdf(self, md_path: str) -> str:
         """Convert a resume markdown file to RDF Turtle format."""
-        ...
-
-
-class EmbeddingProvider(ABC):
-    """Port interface for embedding operations."""
-
-    @abstractmethod
-    def embed(self, texts: list[str]) -> list[list[float]]:
-        """Generate embeddings for a list of texts."""
-        ...
-
-    @abstractmethod
-    def embed_query(self, query: str) -> list[float]:
-        """Generate an embedding for a single query string."""
         ...
