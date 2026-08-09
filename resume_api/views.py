@@ -10,7 +10,7 @@ from .serializers import PromptSerializer, RagSearchSerializer
 from .services.langgraph_service import search_with_context
 from .services.rdf_converter import convert_resume_to_rdf
 from .services.simple_search_service import search_simple
-from .services.rag_answer_service import answer_with_rag
+from .services.rag_langgraph_service import search_rag_with_context
 
 # Swagger response schema
 success_response = openapi.Response(
@@ -54,6 +54,7 @@ rag_success_response = openapi.Response(
         type=openapi.TYPE_OBJECT,
         properties={
             "prompt": openapi.Schema(type=openapi.TYPE_STRING),
+            "session_id": openapi.Schema(type=openapi.TYPE_STRING),
             "model": openapi.Schema(type=openapi.TYPE_STRING),
             "answer": openapi.Schema(type=openapi.TYPE_STRING),
             "retrieved_chunks": openapi.Schema(
@@ -252,10 +253,10 @@ def search_knowledge_graph_simple(request):
 @swagger_auto_schema(
     method="post",
     operation_description=(
-        "Performs semantic RAG search over the indexed resume chunks and "
-        "generates a grounded answer using OpenRouter."
+        "Performs session-aware semantic RAG search over indexed resume chunks. "
+        "Pass the returned session_id to continue the conversation."
     ),
-    operation_summary="Semantic RAG resume search",
+    operation_summary="Session-aware semantic RAG resume search",
     request_body=RagSearchSerializer,
     responses={
         200: rag_success_response,
@@ -271,10 +272,11 @@ def search_rag(request):
         return Response({"error": serializer.errors}, status=400)
 
     data = serializer.validated_data
+    session_id = data.get("session_id", "").strip()
+    if not session_id or session_id == "string":
+        session_id = str(uuid.uuid4())
     try:
-        result = answer_with_rag(
-            data["prompt"],
-        )
+        result = search_rag_with_context(session_id, data["prompt"])
         return Response(result, status=200)
     except ValueError as exc:
         return Response({"error": str(exc)}, status=400)

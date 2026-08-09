@@ -20,12 +20,32 @@ def _local_name(value) -> str:
     return str(value).rsplit("#", 1)[-1].rsplit("/", 1)[-1]
 
 
+def _literal_by_name(graph, subject, name: str) -> str:
+    for predicate, value in graph.predicate_objects(subject):
+        if _local_name(predicate) == name and isinstance(value, Literal):
+            return str(value)
+    return ""
+
+
 def build_resume_chunks(rdf_file_path: str | None = None) -> list[dict]:
     """Create one contextual chunk per meaningful RDF entity or bullet point."""
     path = Path(rdf_file_path) if rdf_file_path else DEFAULT_RDF_PATH
     graph = Graph()
     graph.parse(str(path), format="turtle")
     chunks = []
+
+    parent_context = {}
+    for parent, predicate, child in graph.triples((None, None, None)):
+        parent_type = graph.value(parent, RDF.type)
+        child_type = graph.value(child, RDF.type)
+        if parent_type and child_type and _local_name(child_type) == "BulletPoint":
+            parent_context[child] = {
+                "parent_entity": str(parent),
+                "company": _literal_by_name(graph, parent, "company"),
+                "role": _literal_by_name(graph, parent, "role"),
+                "dates": _literal_by_name(graph, parent, "dates"),
+                "location": _literal_by_name(graph, parent, "location"),
+            }
 
     for subject, _, entity_type in graph.triples((None, RDF.type, None)):
         entity_name = _local_name(entity_type)
@@ -45,13 +65,33 @@ def build_resume_chunks(rdf_file_path: str | None = None) -> list[dict]:
                 parent = _local_name(parent_subject)
                 break
         context = f"{entity_name}"
+        metadata = {"entity_type": entity_name, "entity_uri": str(subject)}
+        if subject in parent_context:
+            parent = parent_context[subject]
+            parent_label = ", ".join(
+                value for value in [
+                    parent["company"],
+                    parent["role"],
+                    parent["dates"],
+                    parent["location"],
+                ] if value
+            )
+            context += f" at {parent_label}"
+            metadata.update(
+                {
+                    key: value
+                    for key, value in parent.items()
+                    if value
+                }
+            )
+            parent = parent["parent_entity"]
         if parent:
             context += f" (related to {parent})"
         chunks.append(
             {
                 "id": str(subject),
                 "document": context + ": " + "; ".join(values),
-                "metadata": {"entity_type": entity_name, "entity_uri": str(subject)},
+                "metadata": metadata,
             }
         )
     return chunks
