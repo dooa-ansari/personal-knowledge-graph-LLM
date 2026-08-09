@@ -2,16 +2,16 @@
 
 A lightweight Django service that combines **RDF/Turtle (.ttl)** data modeling, local **SPARQL** querying via `rdflib`, and session-aware **RAG** through **ChromaDB**, **LangGraph**, and **OpenRouter**.
 
-Instead of dumping raw documents or bloated text chunks into an LLM context window, this project implements a precise **GraphRAG-lite** pattern: translating natural language questions into deterministic SPARQL graph queries to eliminate hallucinations and extract exact background data.
+Instead of dumping raw documents or bloated text chunks into an LLM context window, this project uses the RDF graph as a precise source of structured resume data and provides a session-aware vector RAG API for grounded answers.
 
 ---
 
 ## 🚀 Architecture & Workflow
 
 1. **Semantic Ingestion:** Candidate details and skill networks are structured into standard ontologies (such as Schema.org's `schema:Person`) and serialized as compact **RDF Turtle (`.ttl`)**.
-2. **Intent Translation:** The user types a natural language prompt into the Django interface. The LLM translates this prompt into a precise **SPARQL SELECT query**.
-3. **Local Execution:** Python's `rdflib` runs the SPARQL query locally against the in-memory `.ttl` graph, ensuring 100% data grounding and factual alignment.
-4. **Natural Language Synthesis:** The precise query results are passed back to the LLM to synthesize a professional, context-aware answer for the user.
+2. **RAG Indexing:** Resume entities are converted into contextual chunks and indexed in a persistent ChromaDB collection.
+3. **Conversational Retrieval:** The session-aware RAG workflow rewrites follow-up questions into standalone retrieval queries and retrieves relevant resume chunks.
+4. **Natural Language Synthesis:** The retrieved context is passed to the LLM to synthesize a professional, grounded answer for the user.
 
 The project also provides a vector RAG path. Resume entities are indexed as contextual chunks in ChromaDB. A LangGraph workflow stores conversation state, rewrites follow-up questions into standalone retrieval queries, retrieves the most relevant chunks, and generates an answer grounded only in those chunks.
 
@@ -131,70 +131,6 @@ curl -X POST http://127.0.0.1:8000/api/convert-resume/
 
 This reads `All Details Resume.md`, converts it to RDF, and writes `All Details Resume.ttl` in the same directory.
 
-### Search the knowledge graph (with conversation context)
-
-```bash
-curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph/ \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "What companies has the candidate worked at?"}'
-```
-
-**Example response:**
-```json
-{
-  "prompt": "What companies has the candidate worked at?",
-  "model": "inclusionai/ling-3.0-flash",
-  "sparql_query": "PREFIX resume: <http://example.org/resume#> SELECT ?company WHERE { ... }",
-  "query_results": {
-    "columns": ["company"],
-    "rows": [
-      {"company": "DeepSkill GmbH"},
-      {"company": "Greator GmbH"},
-      {"company": "Mindshine GmbH"},
-      {"company": "VentureDive"},
-      {"company": "Centegy Technologies"},
-      {"company": "Digital Dividend"}
-    ],
-    "row_count": 6
-  },
-  "answer": "The candidate has worked at 6 companies: DeepSkill GmbH, Greator GmbH, Mindshine GmbH, VentureDive, Centegy Technologies, and Digital Dividend."
-}
-```
-
-### Search the knowledge graph (stateless, one-shot)
-
-For a single question/answer with no conversation context or session tracking:
-
-```bash
-curl -X POST http://127.0.0.1:8000/api/search-knowledge-graph-simple/ \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "What companies has the candidate worked at?"}'
-```
-
-**Example response:**
-```json
-{
-  "prompt": "What companies has the candidate worked at?",
-  "model": "inclusionai/ling-3.0-flash",
-  "sparql_query": "PREFIX resume: <http://example.org/resume#> SELECT ?company WHERE { ... }",
-  "query_results": {
-    "columns": ["company"],
-    "rows": [
-      {"company": "DeepSkill GmbH"},
-      {"company": "Greator GmbH"},
-      {"company": "Mindshine GmbH"},
-      {"company": "VentureDive"},
-      {"company": "Centegy Technologies"},
-      {"company": "Digital Dividend"}
-    ],
-    "row_count": 6
-  },
-  "answer": "The candidate has worked at 6 companies: DeepSkill GmbH, Greator GmbH, Mindshine GmbH, VentureDive, Centegy Technologies, and Digital Dividend."
-}
-```
-
-> **Note:** The simple endpoint returns no `session_id` — each request is fully independent.
-
 ### Session-aware semantic RAG search
 
 Use `/api/search-rag/` for vector retrieval and conversational follow-ups:
@@ -222,8 +158,6 @@ The request body accepts only `prompt` and optional `session_id`. Retrieval size
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/convert-resume/` | Convert resume markdown to RDF (.ttl) |
-| `POST` | `/api/search-knowledge-graph/` | Search knowledge graph with AI + conversation context (LangGraph, session-based) |
-| `POST` | `/api/search-knowledge-graph-simple/` | Search knowledge graph with AI (stateless, one-shot, no session) |
 | `POST` | `/api/search-rag/` | Session-aware vector RAG with LangGraph query rewriting |
 | `GET` | `/swagger/` | Swagger UI (interactive API documentation) |
 | `GET` | `/redoc/` | ReDoc UI (alternative API documentation) |
@@ -233,14 +167,14 @@ The request body accepts only `prompt` and optional `session_id`. Retrieval size
 
 ---
 
-## 🔍 How the Knowledge Graph Search Works
+## 🔍 RDF Knowledge Graph and RAG
 
 ```mermaid
 flowchart TD
-    A[User Prompt] --> B["Step 1: SPARQL Generation<br/>OpenRouter (Inclusion AI Ling 3.0 Flash)<br/>with SPARQL_SYSTEM_PROMPT"]
-    B --> C["Step 2: SPARQL Execution<br/>rdflib (local, deterministic)<br/>against All Details Resume.ttl"]
-    C --> D["Step 3: Natural Language Synthesis<br/>OpenRouter (Inclusion AI Ling 3.0 Flash)<br/>with NATURAL_LANGUAGE_SYSTEM_PROMPT"]
-    D --> E[API Response]
+    A[Resume Markdown] --> B["RDF Conversion<br/>All Details Resume.ttl"]
+    B --> C["RAG Indexing<br/>Contextual chunks in ChromaDB"]
+    C --> D["Session-aware retrieval<br/>LangGraph query rewriting"]
+    D --> E["Grounded answer<br/>OpenRouter LLM"]
 
     style A fill:#4CAF50,color:#fff
     style B fill:#2196F3,color:#fff
@@ -251,46 +185,7 @@ flowchart TD
 
 ---
 
-## 🔄 LangGraph Workflow (Conversational Search)
-
-The `/api/search-knowledge-graph/` endpoint is orchestrated by a **LangGraph StateGraph** built in `resume_api/services/langgraph_service.py`. Unlike a single-shot pipeline, this workflow maintains conversation context across turns using a `MemorySaver` checkpointer keyed by `thread_id` (the client-provided `session_id`).
-
-The line `workflow.set_entry_point("generate_sparql")` declares **where execution starts**: the **`generate_sparql`** node. Edges alone only describe transitions between nodes; this line anchors the graph so that `_compiled_workflow.invoke(...)` always begins at the SPARQL-generation step.
-
-```mermaid
-flowchart TD
-    StartNode["🟢 START"] --> SparqlNode["generate_sparql 🔵 (entry point)<br/>LLM: conversation history → SPARQL query<br/>via SPARQL_SYSTEM_PROMPT"]
-    SparqlNode --> ValidateNode["validate_sparql 🟡<br/>rdflib parses query syntax<br/>stores valid/error state"]
-    ValidateNode -->|"valid"| ExecNode["execute_sparql 🟠<br/>rdflib runs query on All Details Resume.ttl<br/>stores results in state"]
-    ValidateNode -->|"invalid + attempts remaining"| SparqlNode
-    ValidateNode -->|"invalid + retry limit reached"| InvalidNode["invalid_sparql 🔴<br/>raises validation error"]
-    ExecNode --> AnsNode["generate_answer 🟣<br/>LLM: results → natural language answer<br/>appends AIMessage to history"]
-    AnsNode --> EndNode["🔴 END"]
-    InvalidNode --> ErrorEnd["🔴 ERROR"]
-    AnsNode --> RespNode["🟢 API Response<br/>sparql_query / query_results / answer"]
-
-    subgraph Memory["Persisted state (MemorySaver, thread_id = session_id)"]
-        StateNode["GraphState: messages, sparql_query,<br/>query_results, answer, attempts, error, valid"]
-    end
-
-    AnsNode -->|"saves state"| StateNode
-    SparqlNode -.->|"loads conversation history"| StateNode
-
-    style StartNode fill:#4CAF50,color:#fff
-    style SparqlNode fill:#2196F3,color:#fff
-    style ValidateNode fill:#FFC107,color:#000
-    style ExecNode fill:#FF9800,color:#fff
-    style AnsNode fill:#9C27B0,color:#fff
-    style EndNode fill:#F44336,color:#fff
-    style InvalidNode fill:#F44336,color:#fff
-    style ErrorEnd fill:#F44336,color:#fff
-    style StateNode fill:#607D8B,color:#fff
-    style RespNode fill:#4CAF50,color:#fff
-```
-
-Each user turn follows **generate → validate → execute → answer**. If validation fails, the conditional edge sends the workflow back to `generate_sparql` while attempts remain; after the retry limit, `invalid_sparql` raises a clear error. The dashed lines show how prior turns and retry state are loaded from and saved to the checkpointer, enabling follow-ups like *"What did she do there?"*.
-
-## 🔎 LangGraph Workflow (Session-aware RAG)
+##  LangGraph Workflow (Session-aware RAG)
 
 The `/api/search-rag/` endpoint uses a separate workflow in `resume_api/services/rag_langgraph_service.py`:
 
@@ -336,7 +231,6 @@ python3 manage.py test resume_api -v 2
 | `ResumeApiEndpointTests` | 6 | Convert-resume endpoint |
 | `OpenRouterServiceTests` | 4 | OpenRouter API client |
 | `SparqlServiceTests` | 6 | SPARQL execution engine |
-| `SearchKnowledgeGraphEndpointTests` | 7 | Search endpoint (success, errors, method validation) |
 | `LangGraphServiceTests` | 3 | LangGraph conversational search service |
 | `SimpleSearchServiceTests` | 3 | Stateless one-shot search service |
 | `SimpleSearchEndpointTests` | 6 | Stateless search endpoint |
