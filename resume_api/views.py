@@ -56,6 +56,7 @@ rag_success_response = openapi.Response(
             "prompt": openapi.Schema(type=openapi.TYPE_STRING),
             "session_id": openapi.Schema(type=openapi.TYPE_STRING),
             "model": openapi.Schema(type=openapi.TYPE_STRING),
+            "retrieval_query": openapi.Schema(type=openapi.TYPE_STRING),
             "answer": openapi.Schema(type=openapi.TYPE_STRING),
             "retrieved_chunks": openapi.Schema(
                 type=openapi.TYPE_ARRAY,

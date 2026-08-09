@@ -23,15 +23,40 @@ Return only a concise natural-language answer.
 
 class RagGraphState(TypedDict):
     messages: list
+    retrieval_query: str
     retrieved_chunks: list
     answer: str
 
 
-def _retrieve_node(state: RagGraphState) -> RagGraphState:
-    retrieval_query = "\n".join(
-        message.content for message in state["messages"][-4:]
+def _rewrite_query_node(state: RagGraphState) -> RagGraphState:
+    latest_question = next(
+        message.content
+        for message in reversed(state["messages"])
+        if isinstance(message, HumanMessage)
     )
-    state["retrieved_chunks"] = search_semantic(retrieval_query)
+    history = "\n".join(
+        f"{message.type}: {message.content}"
+        for message in state["messages"][:-1]
+    )
+    rewrite_prompt = (
+        "Rewrite the current question as one standalone semantic search query "
+        "for a resume database. Resolve pronouns and references using the "
+        "conversation history. Preserve the user's intent. Return only the "
+        "rewritten query, with no explanation.\n\n"
+        f"Conversation history:\n{history or '(none)'}\n\n"
+        f"Current question:\n{latest_question}"
+    )
+    rewritten = query_openrouter(
+        rewrite_prompt,
+        model=DEFAULT_MODEL,
+        system_prompt="You rewrite questions into standalone search queries.",
+    ).strip()
+    state["retrieval_query"] = rewritten or latest_question
+    return state
+
+
+def _retrieve_node(state: RagGraphState) -> RagGraphState:
+    state["retrieved_chunks"] = search_semantic(state["retrieval_query"])
     return state
 
 
@@ -67,11 +92,13 @@ def _answer_node(state: RagGraphState) -> RagGraphState:
 
 def _build_workflow():
     workflow = StateGraph(RagGraphState)
+    workflow.add_node("rewrite_query", _rewrite_query_node)
     workflow.add_node("retrieve", _retrieve_node)
     workflow.add_node("answer", _answer_node)
+    workflow.add_edge("rewrite_query", "retrieve")
     workflow.add_edge("retrieve", "answer")
     workflow.add_edge("answer", END)
-    workflow.set_entry_point("retrieve")
+    workflow.set_entry_point("rewrite_query")
     return workflow.compile(checkpointer=MemorySaver())
 
 
@@ -94,6 +121,7 @@ def search_rag_with_context(session_id: str, prompt: str) -> dict:
         "prompt": prompt.strip(),
         "session_id": session_id,
         "model": DEFAULT_MODEL,
+        "retrieval_query": result["retrieval_query"],
         "answer": result["answer"],
         "retrieved_chunks": result["retrieved_chunks"],
     }
