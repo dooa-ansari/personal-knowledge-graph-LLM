@@ -32,7 +32,7 @@ CHROMA_PERSIST_PATH = os.getenv(
     "CHROMA_PERSIST_PATH", str(BASE_DIR / "data" / "chroma")
 )
 RAG_COLLECTION_NAME = os.getenv("RAG_COLLECTION_NAME", "resume_chunks")
-RAG_TOP_K = int(os.getenv("RAG_TOP_K", "8"))
+RAG_TOP_K = int(os.getenv("RAG_TOP_K", "2"))
 CHROMA_ANONYMIZED_TELEMETRY = False
 
 

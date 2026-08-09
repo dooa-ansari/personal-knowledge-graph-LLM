@@ -6,10 +6,11 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .serializers import PromptSerializer
+from .serializers import PromptSerializer, RagSearchSerializer
 from .services.langgraph_service import search_with_context
 from .services.rdf_converter import convert_resume_to_rdf
 from .services.simple_search_service import search_simple
+from .services.rag_answer_service import answer_with_rag
 
 # Swagger response schema
 success_response = openapi.Response(
@@ -30,6 +31,35 @@ error_response = openapi.Response(
         type=openapi.TYPE_OBJECT,
         properties={
             "error": openapi.Schema(type=openapi.TYPE_STRING, description="Error message"),
+        },
+    ),
+)
+
+rag_chunk_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "document": openapi.Schema(type=openapi.TYPE_STRING),
+        "metadata": openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            additional_properties=openapi.Schema(type=openapi.TYPE_STRING),
+        ),
+        "distance": openapi.Schema(type=openapi.TYPE_NUMBER, format="double"),
+        "score": openapi.Schema(type=openapi.TYPE_NUMBER, format="double"),
+    },
+)
+
+rag_success_response = openapi.Response(
+    description="Grounded RAG answer",
+    schema=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "prompt": openapi.Schema(type=openapi.TYPE_STRING),
+            "model": openapi.Schema(type=openapi.TYPE_STRING),
+            "answer": openapi.Schema(type=openapi.TYPE_STRING),
+            "retrieved_chunks": openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                items=rag_chunk_schema,
+            ),
         },
     ),
 )
@@ -217,3 +247,36 @@ def search_knowledge_graph_simple(request):
             {"error": f"Failed to query knowledge graph: {str(e)}"},
             status=500,
         )
+
+
+@swagger_auto_schema(
+    method="post",
+    operation_description=(
+        "Performs semantic RAG search over the indexed resume chunks and "
+        "generates a grounded answer using OpenRouter."
+    ),
+    operation_summary="Semantic RAG resume search",
+    request_body=RagSearchSerializer,
+    responses={
+        200: rag_success_response,
+        400: error_response,
+        500: error_response,
+    },
+)
+@api_view(["POST"])
+def search_rag(request):
+    """Run semantic retrieval and grounded answer generation."""
+    serializer = RagSearchSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response({"error": serializer.errors}, status=400)
+
+    data = serializer.validated_data
+    try:
+        result = answer_with_rag(
+            data["prompt"],
+        )
+        return Response(result, status=200)
+    except ValueError as exc:
+        return Response({"error": str(exc)}, status=400)
+    except Exception as exc:
+        return Response({"error": f"Failed to perform RAG search: {exc}"}, status=500)
