@@ -21,28 +21,12 @@ The knowledge graph uses the following namespaces:
 - resume: <http://example.org/resume#>
 - rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-The knowledge graph contains information about a person (foaf:Person/schema:Person) with these entity types:
-- resume:ProfessionalExperience (properties: resume:company, resume:location, resume:dates, resume:role, resume:hasBulletPoint)
-- resume:BulletPoint (property: rdf:value)
-- resume:Education (properties: resume:institution, resume:dates, schema:educationalCredentialAwarded)
-- resume:Language (properties: resume:language, resume:proficiency)
-- resume:AcademicExperience (properties: schema:name, resume:year, resume:location, resume:challenge, resume:technologyStack, resume:outcome, schema:url)
-- resume:SkillCategory (properties: resume:skillCategory, resume:hasSkill)
-- resume:Skill (property: rdf:value)
-- resume:SkillDetail (properties: schema:name, resume:hasSkillItem)
-- resume:SkillItem (property: rdf:value)
-- resume:Project (property: schema:name)
-- foaf:Person (properties: foaf:name, schema:jobTitle)
+The knowledge graph contains information about a person and their resume data.
 
 CRITICAL — Linking predicates on the person node:
-The person node links to the entity types via these resume:has* predicates. You MUST use these to connect a person to their data, NOT the entity type names themselves:
-- ?person resume:hasProfessionalExperience ?exp .    (links to resume:ProfessionalExperience nodes)
-- ?person resume:hasEducation ?edu .                (links to resume:Education nodes)
-- ?person resume:hasLanguage ?lang .                (links to resume:Language nodes)
-- ?person resume:hasAcademicExperience ?academic .  (links to resume:AcademicExperience nodes)
-- ?person resume:hasSkillCategory ?category .       (links to resume:SkillCategory nodes)
-- ?person resume:hasSkillDetail ?detail .           (links to resume:SkillDetail nodes)
-- ?person resume:hasProject ?project .              (links to resume:Project nodes)
+The person node links to resume data through resume:has* predicates. Use the
+predicate required by the user's question rather than using entity type names
+as predicates.
 
 For example, to find a person's work experience, use:
   ?person a foaf:Person .

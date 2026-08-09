@@ -19,6 +19,9 @@ db.sqlite3-journal
 # Environment variables
 .env
 
+# Local RAG vector-store data
+/data/chroma/
+
 # IDE
 .vscode/
 .idea/
