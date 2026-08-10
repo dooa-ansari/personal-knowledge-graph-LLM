@@ -7,6 +7,8 @@ import logging
 import requests
 from django.conf import settings
 
+from resume_api.utils import require_api_key
+
 from .model_config import DEFAULT_MODEL
 
 logger = logging.getLogger(__name__)
@@ -32,11 +34,8 @@ def query_openrouter(
         ValueError: If the API key is not configured
         requests.RequestException: If the API call fails
     """
-    api_key = settings.OPENROUTER_API_KEY
+    api_key = require_api_key()
     base_url = settings.OPENROUTER_BASE_URL
-
-    if not api_key or api_key == "your-openrouter-api-key-here":
-        raise ValueError("OpenRouter API key is not configured. Set OPENROUTER_API_KEY in your .env file.")
 
     url = f"{base_url}/chat/completions"
 

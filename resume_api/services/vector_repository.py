@@ -1,31 +1,17 @@
 """ChromaDB vector repository for semantic resume search."""
 
-import os
-
-os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
-
-import chromadb
-from chromadb.config import Settings as ChromaSettings
 from django.conf import settings
 
-from resume_api.utils import get_embedding_client
+from resume_api.utils import create_embeddings, get_chroma_client
 
 
 class ChromaVectorRepository:
     """ChromaDB-backed vector repository for resume chunk search."""
 
-    def _embedding_client(self):
-        """Create an OpenAI-compatible client pointed at OpenRouter."""
-        return get_embedding_client()
-
     def _collection(self):
         """Open the persisted collection without creating a missing index."""
-        client = chromadb.PersistentClient(
-            path=settings.CHROMA_PERSIST_PATH,
-            settings=ChromaSettings(anonymized_telemetry=False),
-        )
         try:
-            return client.get_collection(settings.RAG_COLLECTION_NAME)
+            return get_chroma_client().get_collection(settings.RAG_COLLECTION_NAME)
         except Exception as exc:
             raise RuntimeError(
                 "RAG index is not available. Run `python3 manage.py reindex_rag` first."
@@ -46,10 +32,7 @@ class ChromaVectorRepository:
         if limit < 1:
             raise ValueError("top_k must be greater than zero.")
 
-        embedding_response = self._embedding_client().embeddings.create(
-            model=settings.EMBEDDING_MODEL,
-            input=[query],
-        )
+        embedding_response = create_embeddings([query])
         query_embedding = embedding_response.data[0].embedding
         result = self._collection().query(
             query_embeddings=[query_embedding],

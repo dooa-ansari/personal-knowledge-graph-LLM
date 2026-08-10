@@ -1,17 +1,12 @@
 """Build and persist fine-grained vector chunks from the resume graph."""
 
 import logging
-import os
 from pathlib import Path
 
-os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
-
-import chromadb
-from chromadb.config import Settings as ChromaSettings
 from django.conf import settings
 from rdflib import Graph, Literal, RDF
 
-from resume_api.utils import get_embedding_client
+from resume_api.utils import create_embeddings, get_chroma_client, require_api_key
 
 logger = logging.getLogger(__name__)
 
@@ -101,28 +96,19 @@ def build_resume_chunks(rdf_file_path: str | None = None) -> list[dict]:
 
 def reindex_rag(rdf_file_path: str | None = None) -> int:
     """Rebuild the configured Chroma collection using OpenAI embeddings."""
-    api_key = settings.OPENROUTER_API_KEY
-    if not api_key or api_key == "your-openrouter-api-key-here":
-        raise ValueError("OPENROUTER_API_KEY is not configured.")
+    require_api_key()
 
     chunks = build_resume_chunks(rdf_file_path)
     logger.info("Built %d chunks from RDF graph", len(chunks))
 
-    client = chromadb.PersistentClient(
-        path=settings.CHROMA_PERSIST_PATH,
-        settings=ChromaSettings(anonymized_telemetry=False),
-    )
+    client = get_chroma_client()
     try:
         client.delete_collection(settings.RAG_COLLECTION_NAME)
     except Exception:
         pass
     collection = client.get_or_create_collection(settings.RAG_COLLECTION_NAME)
 
-    embedding_client = get_embedding_client()
-    response = embedding_client.embeddings.create(
-        model=settings.EMBEDDING_MODEL,
-        input=[chunk["document"] for chunk in chunks],
-    )
+    response = create_embeddings([chunk["document"] for chunk in chunks])
     collection.add(
         ids=[chunk["id"] for chunk in chunks],
         documents=[chunk["document"] for chunk in chunks],
