@@ -1,1 +1,0 @@
-"""Use cases for the resume knowledge graph application."""

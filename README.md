@@ -1,6 +1,6 @@
 # Django RDF Semantic Resume Agent 🧠🕸️
 
-A lightweight Django service that combines **RDF/Turtle (.ttl)** data modeling and session-aware **RAG** through **ChromaDB**, **LangGraph**, and **OpenRouter**.
+A lightweight Django service that combines **RDF/Turtle (.ttl)** data modeling and session-aware **RAG** through **ChromaDB** and **OpenRouter**.
 
 Instead of dumping raw documents or bloated text chunks into an LLM context window, this project uses the RDF graph as a precise source of structured resume data and provides a session-aware vector RAG API for grounded answers.
 
@@ -13,7 +13,7 @@ Instead of dumping raw documents or bloated text chunks into an LLM context wind
 3. **Conversational Retrieval:** The session-aware RAG workflow rewrites follow-up questions into standalone retrieval queries and retrieves relevant resume chunks.
 4. **Natural Language Synthesis:** The retrieved context is passed to the LLM to synthesize a professional, grounded answer for the user.
 
-The project also provides a vector RAG path. Resume entities are indexed as contextual chunks in ChromaDB. A LangGraph workflow stores conversation state, rewrites follow-up questions into standalone retrieval queries, retrieves the most relevant chunks, and generates an answer grounded only in those chunks.
+The project also provides a vector RAG path. Resume entities are indexed as contextual chunks in ChromaDB. A simple in-memory session store retains conversation history, rewrites follow-up questions into standalone retrieval queries, retrieves the most relevant chunks, and generates an answer grounded only in those chunks.
 
 ---
 
@@ -24,7 +24,7 @@ The project also provides a vector RAG path. Resume entities are indexed as cont
 * **LLM Orchestration:** OpenAI-compatible API via OpenRouter (`requests` library)
 * **AI Model:** Inclusion AI Ling 3.0 Flash via OpenRouter (`inclusionai/ling-3.0-flash`) — configured centrally in `resume_api/services/model_config.py`
 * **Vector Retrieval:** ChromaDB persistent collection with OpenRouter embeddings
-* **RAG Orchestration:** LangGraph `StateGraph` with `MemorySaver` session checkpoints
+* **RAG Orchestration:** Simple sequential workflow (no LangGraph dependency)
 * **API Documentation:** Swagger / OpenAPI via `drf-yasg`
 * **Environment Management:** `python-dotenv`
 
@@ -50,17 +50,17 @@ personal-knowledge-graph/
 │   ├── views.py
 │   └── urls.py
 └── resume_api/                # Resume API app
-    ├── views.py               # API endpoints + system prompts
+    ├── views.py               # API endpoints (direct service calls, no DI container)
     ├── urls.py                # API URL routing
-│   ├── serializers.py         # DRF serializers for Swagger
-│   ├── tests.py               # 32 unit tests
+    ├── serializers.py         # DRF serializers for Swagger
+    ├── utils.py               # Shared utilities (embedding client)
+    ├── tests.py               # 33 unit tests
     └── services/
         ├── rdf_converter.py   # Resume markdown → RDF converter
-        ├── openrouter_service.py  # OpenRouter LLM client
-        ├── rag_langgraph_service.py # Session-aware RAG workflow + query rewriting
-        ├── rag_indexer.py         # RDF entities → contextual vector chunks
-        ├── vector_search_service.py # ChromaDB semantic retrieval
-        ├── rag_answer_service.py   # Stateless grounded RAG orchestration
+        ├── openrouter_service.py  # OpenRouter LLM client (with logging)
+        ├── rag_service.py     # Session-aware RAG workflow (no LangGraph)
+        ├── rag_indexer.py     # RDF entities → contextual vector chunks
+        ├── vector_repository.py  # ChromaDB semantic retrieval
         └── model_config.py    # Central model configuration (single source of truth)
 ```
 
@@ -155,7 +155,7 @@ The request body accepts only `prompt` and optional `session_id`. Retrieval size
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/convert-resume/` | Convert resume markdown to RDF (.ttl) |
-| `POST` | `/api/search-rag/` | Session-aware vector RAG with LangGraph query rewriting |
+| `POST` | `/api/search-rag/` | Session-aware vector RAG with query rewriting |
 | `GET` | `/swagger/` | Swagger UI (interactive API documentation) |
 | `GET` | `/redoc/` | ReDoc UI (alternative API documentation) |
 | `GET` | `/swagger.json` | Swagger JSON schema |
@@ -170,7 +170,7 @@ The request body accepts only `prompt` and optional `session_id`. Retrieval size
 flowchart TD
     A[Resume Markdown] --> B["RDF Conversion<br/>All Details Resume.ttl"]
     B --> C["RAG Indexing<br/>Contextual chunks in ChromaDB"]
-    C --> D["Session-aware retrieval<br/>LangGraph query rewriting"]
+    C --> D["Session-aware retrieval<br/>Query rewriting + ChromaDB search"]
     D --> E["Grounded answer<br/>OpenRouter LLM"]
 
     style A fill:#4CAF50,color:#fff
@@ -182,9 +182,9 @@ flowchart TD
 
 ---
 
-##  LangGraph Workflow (Session-aware RAG)
+## RAG Workflow (Session-aware)
 
-The `/api/search-rag/` endpoint uses a separate workflow in `resume_api/services/rag_langgraph_service.py`:
+The `/api/search-rag/` endpoint uses a simple sequential workflow in `resume_api/services/rag_service.py`:
 
 ```mermaid
 flowchart TD
@@ -193,8 +193,8 @@ flowchart TD
     Retrieve --> Answer["🟣 answer<br/>LLM uses conversation + retrieved context<br/>grounded response"]
     Answer --> End["🔴 END<br/>answer + retrieval_query + chunks"]
 
-    subgraph Memory["LangGraph MemorySaver<br/>thread_id = session_id"]
-        State["messages<br/>retrieval_query<br/>retrieved_chunks<br/>answer"]
+    subgraph Memory["In-Memory Session Store<br/>key = session_id"]
+        State["message history<br/>(user + assistant turns)"]
     end
 
     State -.-> Rewrite
@@ -208,13 +208,13 @@ flowchart TD
     style State fill:#607D8B,color:#fff
 ```
 
-The rewrite node is an LLM call, but it uses the existing configured model. It is intentionally separate from retrieval: conversation history is retained for context resolution, while ChromaDB receives one focused standalone query instead of a concatenation of previous topics.
+The rewrite node is an LLM call, but it uses the existing configured model. It is intentionally separate from retrieval: conversation history is retained for context resolution, while ChromaDB receives one focused standalone query instead of a concatenation of previous topics. Session state is stored in memory (replace with Django cache or database for production).
 
 ---
 
 ## 🧪 Testing
 
-Run the full test suite (32 tests):
+Run the full test suite (33 tests):
 
 ```bash
 python3 manage.py test resume_api -v 2
@@ -226,10 +226,10 @@ python3 manage.py test resume_api -v 2
 |------------|-------|-------------|
 | `RDFConverterServiceTests` | 11 | RDF converter parsing functions |
 | `ResumeApiEndpointTests` | 6 | Convert-resume endpoint |
+| `RagSearchEndpointTests` | 4 | Session-aware RAG API validation |
+| `RagServiceTests` | 2 | Query rewriting, retrieval, and session history |
 | `OpenRouterServiceTests` | 4 | OpenRouter API client |
 | `SwaggerEndpointTests` | 4 | Swagger/ReDoc documentation |
-| `RagSearchEndpointTests` | 4 | Session-aware RAG API validation |
-| `RagLangGraphServiceTests` | 2 | Query rewriting, retrieval, and session history |
 
 ---
 
@@ -272,8 +272,6 @@ The knowledge graph uses the following namespaces:
 | drf-yasg | 1.21.15 | Swagger/OpenAPI documentation |
 | python-dotenv | 1.0.1 | Environment variable loading |
 | `requests` | 2.31.0 | HTTP client for OpenRouter API |
-| `langgraph` | 1.2.10 | Stateful workflow orchestration |
-| `langchain-core` | 1.5.3 | Message and graph primitives |
 | `chromadb` | 0.6.3+ | Persistent vector database |
 | `openai` | 2.x | OpenRouter-compatible embeddings client |
 

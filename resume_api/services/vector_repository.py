@@ -1,4 +1,4 @@
-"""Concrete vector repository adapter owning the ChromaDB logic directly."""
+"""ChromaDB vector repository for semantic resume search."""
 
 import os
 
@@ -7,22 +7,16 @@ os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 from django.conf import settings
-from openai import OpenAI
 
-from resume_api.ports.repositories import VectorRepository
+from resume_api.utils import get_embedding_client
 
 
-class ChromaVectorRepository(VectorRepository):
-    """Adapter that owns ChromaDB logic directly — no delegation to old services."""
+class ChromaVectorRepository:
+    """ChromaDB-backed vector repository for resume chunk search."""
 
-    def _embedding_client(self) -> OpenAI:
+    def _embedding_client(self):
         """Create an OpenAI-compatible client pointed at OpenRouter."""
-        if not settings.OPENROUTER_API_KEY or settings.OPENROUTER_API_KEY == "your-openrouter-api-key-here":
-            raise ValueError("OPENROUTER_API_KEY is not configured.")
-        return OpenAI(
-            api_key=settings.OPENROUTER_API_KEY,
-            base_url=settings.OPENROUTER_BASE_URL,
-        )
+        return get_embedding_client()
 
     def _collection(self):
         """Open the persisted collection without creating a missing index."""

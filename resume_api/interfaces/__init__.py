@@ -1,1 +1,0 @@
-"""Interface adapters layer (controllers, presenters, serializers)."""

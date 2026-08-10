@@ -23,6 +23,7 @@ from .services.rdf_converter import (
     convert_resume_to_rdf,
 )
 from .services.rag_indexer import build_resume_chunks
+from .services.rag_service import search_rag
 
 # Sample resume markdown content for testing
 SAMPLE_RESUME = """# **TEST USER**
@@ -266,13 +267,13 @@ class ResumeApiEndpointTests(TestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @patch("resume_api.adapters.rdf_repository._convert", side_effect=FileNotFoundError("Resume file not found"))
+    @patch("resume_api.views.convert_resume_to_rdf", side_effect=FileNotFoundError("Resume file not found"))
     def test_post_convert_resume_file_not_found(self, mock_convert):
         response = self.client.post(self.url)
-        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        self.assertIn("Failed to convert resume to RDF", response.data["error"])
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("Resume file not found", response.data["error"])
 
-    @patch("resume_api.adapters.rdf_repository._convert", side_effect=Exception("Test error"))
+    @patch("resume_api.views.convert_resume_to_rdf", side_effect=Exception("Test error"))
     def test_post_convert_resume_conversion_error(self, mock_convert):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -286,7 +287,7 @@ class RagSearchEndpointTests(TestCase):
         self.client = APIClient()
         self.url = reverse("search_rag")
 
-    @patch("resume_api.views.search_rag_with_context")
+    @patch("resume_api.views.search_rag")
     def test_post_rag_success_with_session(self, mock_search):
         mock_search.return_value = {
             "prompt": "What did she do there?",
@@ -306,8 +307,26 @@ class RagSearchEndpointTests(TestCase):
         self.assertEqual(response.data["retrieval_query"], "What did Dooa do at Greator GmbH?")
         mock_search.assert_called_once_with("session-1", "What did she do there?")
 
-    @patch("resume_api.views.search_rag_with_context")
-    def test_post_rag_generates_uuid_for_swagger_placeholder(self, mock_search):
+    @patch("resume_api.views.search_rag")
+    def test_post_rag_empty_session_id_generates_session(self, mock_search):
+        """When session_id is empty, Django session key is used."""
+        mock_search.side_effect = lambda session_id, prompt: {
+            "session_id": session_id,
+            "prompt": prompt,
+            "answer": "answer",
+            "retrieved_chunks": [],
+        }
+        response = self.client.post(self.url, {"prompt": "test"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Django's session key should be non-empty and not "string"
+        generated_id = mock_search.call_args.args[0]
+        self.assertIsNotNone(generated_id)
+        self.assertNotEqual(generated_id, "string")
+        self.assertEqual(response.data["session_id"], generated_id)
+
+    @patch("resume_api.views.search_rag")
+    def test_post_rag_swagger_placeholder_is_cleaned(self, mock_search):
+        """Swagger's 'string' placeholder should be treated like empty."""
         mock_search.side_effect = lambda session_id, prompt: {
             "session_id": session_id,
             "prompt": prompt,
@@ -318,7 +337,6 @@ class RagSearchEndpointTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         generated_id = mock_search.call_args.args[0]
         self.assertNotEqual(generated_id, "string")
-        self.assertEqual(response.data["session_id"], generated_id)
 
     def test_post_rag_requires_prompt(self):
         response = self.client.post(self.url, {}, format="json")
@@ -329,30 +347,49 @@ class RagSearchEndpointTests(TestCase):
         self.assertEqual(self.client.get(self.url).status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class RagLangGraphServiceTests(TestCase):
-    """Unit tests for rewrite, retrieval, answer, and session state."""
+class RagServiceTests(TestCase):
+    """Unit tests for the rag_service rewrite, retrieval, answer, and session state."""
 
-    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.rewrite_query", return_value="What is Dooa Ansari doing currently after Greator GmbH?")
-    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.retrieve", return_value=[{"document": "DeepSkill GmbH", "metadata": {}, "distance": 0.1, "score": 0.9}])
-    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.answer", return_value="Dooa is a Full-Stack Developer at DeepSkill GmbH.")
-    def test_rewrites_follow_up_before_retrieval(self, mock_answer, mock_retrieve, mock_rewrite):
-        from .services.rag_langgraph_service import search_rag_with_context
+    @patch("resume_api.services.rag_service.query_openrouter")
+    def test_rewrites_follow_up_before_retrieval(self, mock_query):
+        # First call: rewrite_query, Second call: answer
+        mock_query.side_effect = [
+            "What is Dooa Ansari doing currently after Greator GmbH?",  # rewrite
+            "Dooa is a Full-Stack Developer at DeepSkill GmbH.",          # answer
+        ]
 
-        result = search_rag_with_context("rag-test-1", "What is she doing now?")
+        with patch("resume_api.services.rag_service.ChromaVectorRepository") as mock_repo:
+            mock_instance = mock_repo.return_value
+            mock_instance.search_semantic.return_value = [
+                {"document": "DeepSkill GmbH", "metadata": {}, "distance": 0.1, "score": 0.9}
+            ]
+
+            result = search_rag("rag-test-1", "What is she doing now?")
 
         self.assertEqual(result["retrieval_query"], "What is Dooa Ansari doing currently after Greator GmbH?")
         self.assertEqual(result["answer"], "Dooa is a Full-Stack Developer at DeepSkill GmbH.")
 
-    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.rewrite_query", side_effect=["first query", "second query"])
-    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.retrieve", return_value=[])
-    @patch("resume_api.use_cases.search_rag.SearchRagUseCase.answer", side_effect=["first answer", "second answer"])
-    def test_session_history_is_available_on_follow_up(self, mock_answer, mock_retrieve, mock_rewrite):
-        from .services.rag_langgraph_service import search_rag_with_context
+    @patch("resume_api.services.rag_service.query_openrouter")
+    def test_session_history_is_available_on_follow_up(self, mock_query):
+        # First turn: rewrite + answer
+        # Second turn: rewrite (with history) + answer
+        mock_query.side_effect = [
+            "first query",       # turn 1 rewrite
+            "first answer",      # turn 1 answer
+            "second query",      # turn 2 rewrite
+            "second answer",     # turn 2 answer
+        ]
 
-        search_rag_with_context("rag-test-2", "When did Dooa work at Greator?")
-        search_rag_with_context("rag-test-2", "What did she do there?")
-        # The second call to rewrite_query should include history from the first turn
-        self.assertEqual(mock_rewrite.call_count, 2)
+        with patch("resume_api.services.rag_service.ChromaVectorRepository") as mock_repo:
+            mock_instance = mock_repo.return_value
+            mock_instance.search_semantic.return_value = []
+
+            search_rag("rag-test-2", "When did Dooa work at Greator?")
+            result = search_rag("rag-test-2", "What did she do there?")
+
+        self.assertEqual(result["retrieval_query"], "second query")
+        self.assertEqual(mock_query.call_count, 4)
+
 
 class OpenRouterServiceTests(TestCase):
     """Tests for the OpenRouter service."""
