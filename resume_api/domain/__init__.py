@@ -1,1 +1,0 @@
-"""Domain entities for the resume knowledge graph."""

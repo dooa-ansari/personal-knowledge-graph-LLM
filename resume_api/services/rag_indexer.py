@@ -1,5 +1,6 @@
 """Build and persist fine-grained vector chunks from the resume graph."""
 
+import logging
 import os
 from pathlib import Path
 
@@ -8,12 +9,13 @@ os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 from django.conf import settings
-from openai import OpenAI
 from rdflib import Graph, Literal, RDF
 
+from resume_api.utils import get_embedding_client
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_RDF_PATH = Path(__file__).resolve().parents[2] / "All Details Resume.ttl"
-
 
 
 def _local_name(value) -> str:
@@ -104,6 +106,8 @@ def reindex_rag(rdf_file_path: str | None = None) -> int:
         raise ValueError("OPENROUTER_API_KEY is not configured.")
 
     chunks = build_resume_chunks(rdf_file_path)
+    logger.info("Built %d chunks from RDF graph", len(chunks))
+
     client = chromadb.PersistentClient(
         path=settings.CHROMA_PERSIST_PATH,
         settings=ChromaSettings(anonymized_telemetry=False),
@@ -113,10 +117,8 @@ def reindex_rag(rdf_file_path: str | None = None) -> int:
     except Exception:
         pass
     collection = client.get_or_create_collection(settings.RAG_COLLECTION_NAME)
-    embedding_client = OpenAI(
-        api_key=api_key,
-        base_url=settings.OPENROUTER_BASE_URL,
-    )
+
+    embedding_client = get_embedding_client()
     response = embedding_client.embeddings.create(
         model=settings.EMBEDDING_MODEL,
         input=[chunk["document"] for chunk in chunks],
@@ -127,4 +129,5 @@ def reindex_rag(rdf_file_path: str | None = None) -> int:
         metadatas=[chunk["metadata"] for chunk in chunks],
         embeddings=[item.embedding for item in response.data],
     )
+    logger.info("Indexed %d chunks into Chroma collection '%s'", len(chunks), settings.RAG_COLLECTION_NAME)
     return len(chunks)
