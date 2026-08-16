@@ -42,7 +42,7 @@ personal-knowledge-graph/
 ├── All Details Resume.md      # Source resume markdown file
 ├── All Details Resume.ttl     # Generated RDF knowledge graph
 ├── config/                    # Django project configuration
-│   ├── settings.py            # Settings (loads .env, registers apps)
+│   ├── settings/               # Settings package (dev.py, prod.py, base.py)
 │   ├── urls.py                # Root URL routing + Swagger
 │   ├── asgi.py
 │   └── wsgi.py
@@ -157,7 +157,6 @@ The request body accepts only `prompt` and optional `session_id`. Retrieval size
 | `POST` | `/api/convert-resume/` | Convert resume markdown to RDF (.ttl) |
 | `POST` | `/api/search-rag/` | Session-aware vector RAG with query rewriting |
 | `GET` | `/swagger/` | Swagger UI (interactive API documentation) |
-| `GET` | `/redoc/` | ReDoc UI (alternative API documentation) |
 | `GET` | `/swagger.json` | Swagger JSON schema |
 | `GET` | `/swagger.yaml` | Swagger YAML schema |
 | `GET` | `/` | Home page |
@@ -229,7 +228,7 @@ python3 manage.py test resume_api -v 2
 | `RagSearchEndpointTests` | 4 | Session-aware RAG API validation |
 | `RagServiceTests` | 2 | Query rewriting, retrieval, and session history |
 | `OpenRouterServiceTests` | 4 | OpenRouter API client |
-| `SwaggerEndpointTests` | 4 | Swagger/ReDoc documentation |
+| `SwaggerEndpointTests` | 3 | Swagger documentation |
 
 ---
 
