@@ -27,6 +27,8 @@ The project also provides a vector RAG path. Resume entities are indexed as cont
 * **RAG Orchestration:** Simple sequential workflow (no LangGraph dependency)
 * **API Documentation:** Swagger / OpenAPI via `drf-yasg`
 * **Environment Management:** `python-dotenv`
+* **Session Management:** Django's built-in session framework with cookie-based anonymous sessions (HttpOnly, SameSite=Strict)
+* **Security:** Custom middleware for security headers (CSP, XSS protection, HSTS), environment-aware settings (dev/prod)
 
 ---
 
@@ -42,19 +44,28 @@ personal-knowledge-graph/
 ├── All Details Resume.md      # Source resume markdown file
 ├── All Details Resume.ttl     # Generated RDF knowledge graph
 ├── config/                    # Django project configuration
-│   ├── settings/               # Settings package (dev.py, prod.py, base.py)
-│   ├── urls.py                # Root URL routing + Swagger
+│   ├── settings/               # Settings package (base.py, dev.py, prod.py)
+│   │   ├── __init__.py         # Routes to dev/prod based on DJANGO_ENV
+│   │   ├── base.py             # Shared settings (DB, apps, security defaults)
+│   │   ├── dev.py              # DEBUG=True, Swagger enabled, relaxed CSP
+│   │   └── prod.py             # DEBUG=False, Swagger disabled, strict CSP + HSTS
+│   ├── urls.py                # Root URL routing + conditional Swagger
 │   ├── asgi.py
 │   └── wsgi.py
-├── core/                      # Core app (home page)
-│   ├── views.py
-│   └── urls.py
+├── core/                      # Core app (home page, middleware, permissions)
+│   ├── views.py               # Home page view
+│   ├── urls.py                # Core URL routing
+│   ├── middleware.py           # SecurityHeadersMiddleware + SessionEnforcerMiddleware
+│   └── permissions.py         # IsSessionValid DRF permission class
 └── resume_api/                # Resume API app
-    ├── views.py               # API endpoints (direct service calls, no DI container)
+    ├── views.py               # API endpoints (session-based auth via IsSessionValid)
     ├── urls.py                # API URL routing
-    ├── serializers.py         # DRF serializers for Swagger
-    ├── utils.py               # Shared utilities (embedding client)
-    ├── tests.py               # 33 unit tests
+    ├── serializers.py         # DRF serializers for Swagger (cookie-based session)
+    ├── utils.py               # Shared utilities (embedding client, ChromaDB client)
+    ├── tests.py               # 39 unit tests
+    ├── management/
+    │   └── commands/
+    │       └── reindex_rag.py # Django management command to rebuild the RAG index
     └── services/
         ├── rdf_converter.py   # Resume markdown → RDF converter
         ├── openrouter_service.py  # OpenRouter LLM client (with logging)
@@ -92,6 +103,7 @@ personal-knowledge-graph/
    ```
    Edit `.env` and replace `your-openrouter-api-key-here` with your actual OpenRouter API key:
    ```env
+   DJANGO_ENV=development
    OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
    OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxx
    ```
@@ -130,23 +142,27 @@ This reads `All Details Resume.md`, converts it to RDF, and writes `All Details 
 
 ### Session-aware semantic RAG search
 
-Use `/api/search-rag/` for vector retrieval and conversational follow-ups:
+Use `/api/search-rag/` for vector retrieval and conversational follow-ups. Sessions are cookie-based (HttpOnly, SameSite=Strict) — the browser automatically manages the session cookie:
 
 ```bash
+# Start a new conversation (session cookie auto-created)
 curl -X POST http://127.0.0.1:8000/api/search-rag/ \
   -H "Content-Type: application/json" \
+  -c cookies.txt \
   -d '{"prompt": "When did Dooa work at Greator?"}'
 ```
 
-The first response contains a generated `session_id` and the `retrieval_query`. Reuse the session ID for follow-up questions:
+Reuse the session cookie for follow-up questions:
 
 ```bash
+# Follow-up (uses the same session cookie)
 curl -X POST http://127.0.0.1:8000/api/search-rag/ \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "What did she do there?", "session_id": "<session-id-from-response>"}'
+  -b cookies.txt \
+  -d '{"prompt": "What did she do there?"}'
 ```
 
-The request body accepts only `prompt` and optional `session_id`. Retrieval size is controlled server-side by `RAG_TOP_K`.
+The request body accepts only `prompt`. The session is tracked server-side via the browser's session cookie. Retrieval size is controlled server-side by `RAG_TOP_K`.
 
 ---
 
@@ -154,12 +170,47 @@ The request body accepts only `prompt` and optional `session_id`. Retrieval size
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/convert-resume/` | Convert resume markdown to RDF (.ttl) |
-| `POST` | `/api/search-rag/` | Session-aware vector RAG with query rewriting |
-| `GET` | `/swagger/` | Swagger UI (interactive API documentation) |
-| `GET` | `/swagger.json` | Swagger JSON schema |
-| `GET` | `/swagger.yaml` | Swagger YAML schema |
+| `POST` | `/api/convert-resume/` | Convert resume markdown to RDF (.ttl) — requires session cookie |
+| `POST` | `/api/search-rag/` | Session-aware vector RAG with query rewriting — requires session cookie |
+| `GET` | `/swagger/` | Swagger UI (interactive API documentation) — dev only |
+| `GET` | `/swagger.json` | Swagger JSON schema — dev only |
+| `GET` | `/swagger.yaml` | Swagger YAML schema — dev only |
 | `GET` | `/` | Home page |
+
+> **Note:** Swagger endpoints are only available in development mode (`DJANGO_ENV=development`). In production, they are disabled for security.
+
+---
+
+## 🔐 Session & Security
+
+### Anonymous Session Enforcement
+
+Every API request requires a valid anonymous session. The `SessionEnforcerMiddleware` automatically creates a browser-session cookie on the first visit. The `IsSessionValid` permission class rejects requests without a valid session with HTTP 403.
+
+**Session cookie properties:**
+- **HttpOnly** — inaccessible to JavaScript (prevents XSS cookie theft)
+- **SameSite=Strict** — only sent for same-site requests (blocks CSRF)
+- **Expires on browser close** — one-time session enforcement
+
+### Security Headers
+
+Custom `SecurityHeadersMiddleware` injects security headers on every response:
+
+| Header | Dev | Prod |
+|--------|-----|------|
+| `X-XSS-Protection` | `1; mode=block` | `1; mode=block` |
+| `X-Content-Type-Options` | `nosniff` | `nosniff` |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | `strict-origin-when-cross-origin` |
+| `Content-Security-Policy` | Allows `unsafe-inline` (for Swagger) | Strict `default-src 'self'` |
+| `Strict-Transport-Security` | — | `max-age=31536000; includeSubDomains; preload` |
+
+### Environment-aware Settings
+
+Settings are split into a package (`config/settings/`) with environment routing via `DJANGO_ENV`:
+
+- **`base.py`** — Shared settings: database, installed apps, security defaults (HttpOnly cookies, SameSite, XSS protections)
+- **`dev.py`** — `DEBUG=True`, Swagger enabled, relaxed CSP for inline scripts/styles
+- **`prod.py`** — `DEBUG=False`, Swagger disabled, strict CSP, HSTS, HTTPS enforcement, secure cookies
 
 ---
 
@@ -187,12 +238,12 @@ The `/api/search-rag/` endpoint uses a simple sequential workflow in `resume_api
 
 ```mermaid
 flowchart TD
-    Start["🟢 START<br/>session_id + prompt"] --> Rewrite["🔵 rewrite_query<br/>LLM resolves pronouns and references<br/>conversation → standalone query"]
+    Start["🟢 START<br/>session cookie + prompt"] --> Rewrite["🔵 rewrite_query<br/>LLM resolves pronouns and references<br/>conversation → standalone query"]
     Rewrite --> Retrieve["🟠 retrieve<br/>OpenRouter embedding<br/>ChromaDB top-K search"]
     Retrieve --> Answer["🟣 answer<br/>LLM uses conversation + retrieved context<br/>grounded response"]
     Answer --> End["🔴 END<br/>answer + retrieval_query + chunks"]
 
-    subgraph Memory["In-Memory Session Store<br/>key = session_id"]
+    subgraph Memory["In-Memory Session Store<br/>key = Django session key"]
         State["message history<br/>(user + assistant turns)"]
     end
 
@@ -213,7 +264,7 @@ The rewrite node is an LLM call, but it uses the existing configured model. It i
 
 ## 🧪 Testing
 
-Run the full test suite (33 tests):
+Run the full test suite (39 tests):
 
 ```bash
 python3 manage.py test resume_api -v 2
@@ -224,11 +275,14 @@ python3 manage.py test resume_api -v 2
 | Test Class | Tests | Description |
 |------------|-------|-------------|
 | `RDFConverterServiceTests` | 11 | RDF converter parsing functions |
-| `ResumeApiEndpointTests` | 6 | Convert-resume endpoint |
-| `RagSearchEndpointTests` | 4 | Session-aware RAG API validation |
+| `ResumeApiEndpointTests` | 6 | Convert-resume endpoint (session-based auth) |
+| `RagSearchEndpointTests` | 4 | Session-aware RAG API validation (cookie-based session) |
+| `SessionEnforcementTests` | 2 | Anonymous session auto-creation and cookie enforcement |
 | `RagServiceTests` | 2 | Query rewriting, retrieval, and session history |
 | `OpenRouterServiceTests` | 4 | OpenRouter API client |
-| `SwaggerEndpointTests` | 3 | Swagger documentation |
+| `SecurityHeadersTests` | 6 | Security headers and cookie settings enforcement |
+| `RuntimeConfigTests` | 1 | Development runtime environment validation |
+| `SwaggerEndpointTests` | 3 | Swagger documentation endpoints |
 
 ---
 
@@ -280,6 +334,7 @@ The knowledge graph uses the following namespaces:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `DJANGO_ENV` | Environment selector (`development` or `production`) | `development` |
 | `OPENROUTER_BASE_URL` | OpenRouter API base URL | `https://openrouter.ai/api/v1` |
 | `OPENROUTER_API_KEY` | Your OpenRouter API key | (required) |
 | `EMBEDDING_MODEL` | OpenRouter-compatible embedding model | `openai/text-embedding-3-small` |
