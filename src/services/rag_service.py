@@ -67,7 +67,7 @@ def _retrieve(query: str) -> list[RetrievedChunk]:
         collection = get_chroma_client().get_collection(config.RAG_COLLECTION_NAME)
     except Exception as exc:
         raise RuntimeError(
-            "RAG index is not available. Run `python scripts/reindex.py` first."
+            "RAG index is not available. Run `uv run python -m scripts.reindex` first."
         ) from exc
 
     embedding_response = create_embeddings([query])

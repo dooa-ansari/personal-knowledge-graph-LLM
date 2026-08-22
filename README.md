@@ -30,6 +30,18 @@ Instead of dumping raw documents or bloated text chunks into an LLM context wind
 
 ---
 
+## ⚡ Why FastAPI?
+
+FastAPI was chosen as the backend framework for this service due to several architectural advantages:
+
+- **High-Performance & Async Support:** Built on Starlette and ASGI, FastAPI efficiently handles concurrent, I/O-bound operations (such as ChromaDB vector queries and external OpenRouter LLM API calls) with minimal latency.
+- **Automatic Validation & Type Safety:** Seamless integration with Pydantic ensures strict schema validation, type safety, and automatic serialization for search requests, prompts, and RAG chunk responses.
+- **Built-in OpenAPI Documentation:** Generates interactive Swagger UI (`/docs`) and ReDoc (`/redoc`) specifications out of the box with zero additional configuration.
+- **Clean Dependency Injection (`Depends`):** Enables modular and testable security/session handling (such as cookie-based session verification via `get_session_id`).
+- **Modern Python Standards:** Leverages standard Python 3.10+ type hints for clean, readable, and maintainable code.
+
+---
+
 ## 📁 Project Structure
 
 ```
@@ -41,7 +53,7 @@ personal-knowledge-graph/
 ├── .gitignore
 ├── All Details Resume.md       # Source resume markdown file
 ├── All Details Resume.ttl      # Generated RDF knowledge graph
-├── chroma/                     # ChromaDB persistent storage
+├── chroma/                     # ChromaDB persistent storage (or data/chroma/)
 ├── scripts/
 │   └── reindex.py              # CLI to rebuild the RAG index
 ├── src/
@@ -101,7 +113,7 @@ personal-knowledge-graph/
 
 4. **Build the RAG index:**
    ```bash
-   uv run python scripts/reindex.py
+   uv run python -m scripts.reindex
    ```
 
    Re-run this command whenever `All Details Resume.ttl` or the chunking logic changes.
@@ -121,7 +133,7 @@ The server starts at `http://127.0.0.1:8000/`. Interactive API docs at `http://1
 ### Generate the RDF knowledge graph
 
 ```bash
-curl -X POST http://127.0.0.1:8000/api/convert-resume/
+curl -X POST http://127.0.0.1:8000/api/convert-resume
 ```
 
 This reads `All Details Resume.md`, converts it to RDF, and writes `All Details Resume.ttl` in the same directory.
@@ -132,7 +144,7 @@ Sessions are cookie-based (HttpOnly, SameSite=Strict) — the browser automatica
 
 ```bash
 # Start a new conversation (session cookie auto-created)
-curl -X POST http://127.0.0.1:8000/api/search-rag/ \
+curl -X POST http://127.0.0.1:8000/api/search-rag \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{"prompt": "When did Dooa work at Greator?"}'
@@ -142,7 +154,7 @@ Reuse the session cookie for follow-up questions:
 
 ```bash
 # Follow-up (uses the same session cookie)
-curl -X POST http://127.0.0.1:8000/api/search-rag/ \
+curl -X POST http://127.0.0.1:8000/api/search-rag \
   -H "Content-Type: application/json" \
   -b cookies.txt \
   -d '{"prompt": "What did she do there?"}'

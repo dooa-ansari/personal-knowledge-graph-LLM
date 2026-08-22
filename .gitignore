@@ -18,6 +18,10 @@ venv.bak/
 
 # Local RAG vector-store data
 /chroma/
+/data/
+
+# Session cookies for testing
+cookies.txt
 
 # IDE
 .vscode/

@@ -3,6 +3,10 @@
 import argparse
 import logging
 import sys
+from pathlib import Path
+
+# Ensure project root is on sys.path for direct script execution
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.services.rag_indexer import reindex_rag
 
