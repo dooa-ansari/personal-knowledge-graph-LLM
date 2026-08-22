@@ -10,17 +10,18 @@ ENV/
 env.bak/
 venv.bak/
 
-# Django
+# Logs
 *.log
-db.sqlite3
-db.sqlite3-journal
-/staticfiles/
 
 # Environment variables
 .env
 
 # Local RAG vector-store data
-/data/chroma/
+/chroma/
+/data/
+
+# Session cookies for testing
+cookies.txt
 
 # IDE
 .vscode/
