@@ -4,8 +4,7 @@ import logging
 from typing import TypedDict, cast
 
 from src import config
-from src.clients import create_embeddings, get_chroma_client
-from src.services.model_config import DEFAULT_MODEL
+from src.utils import create_embeddings, get_chroma_client
 from src.services.openrouter_service import query_openrouter
 
 logger = logging.getLogger(__name__)
@@ -51,7 +50,7 @@ def _rewrite_query(latest_question: str, history: str) -> str:
     )
     rewritten = query_openrouter(
         prompt=rewrite_prompt,
-        model=DEFAULT_MODEL,
+        model=config.DEFAULT_MODEL,
         system_prompt="You rewrite questions into standalone search queries.",
     ).strip()
     return rewritten or latest_question
@@ -67,7 +66,7 @@ def _retrieve(query: str) -> list[RetrievedChunk]:
         collection = get_chroma_client().get_collection(config.RAG_COLLECTION_NAME)
     except Exception as exc:
         raise RuntimeError(
-            "RAG index is not available. Run `uv run python -m scripts.reindex` first."
+            "RAG index is not available. Run `uv run python -m scripts.reindex_embeddings` first."
         ) from exc
 
     embedding_response = create_embeddings([query])
@@ -110,7 +109,7 @@ def _answer(question: str, history: str, chunks: list[RetrievedChunk]) -> str:
     )
     return query_openrouter(
         prompt,
-        model=DEFAULT_MODEL,
+        model=config.DEFAULT_MODEL,
         system_prompt=RAG_CONVERSATION_SYSTEM_PROMPT,
     ).strip()
 
@@ -147,7 +146,7 @@ def search_rag(session_id: str, prompt: str) -> RagResult:
     return {
         "prompt": prompt.strip(),
         "session_id": session_id,
-        "model": DEFAULT_MODEL,
+        "model": config.DEFAULT_MODEL,
         "retrieval_query": retrieval_query,
         "answer": answer,
         "retrieved_chunks": retrieved_chunks,

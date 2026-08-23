@@ -23,7 +23,7 @@ class TestSearchRag:
             ],
         }
 
-        with patch("src.routers.rag.search_rag") as mock_search:
+        with patch("src.routers.ai_chat.search_rag") as mock_search:
             mock_search.return_value = mock_result
 
             response = client.post(
@@ -37,7 +37,7 @@ class TestSearchRag:
         assert len(data["retrieved_chunks"]) == 1
 
     def test_search_empty_prompt(self, client):
-        with patch("src.routers.rag.search_rag") as mock_search:
+        with patch("src.routers.ai_chat.search_rag") as mock_search:
             mock_search.side_effect = ValueError("Prompt is required.")
 
             response = client.post("/api/search-rag", json={"prompt": ""})
@@ -50,7 +50,7 @@ class TestSearchRag:
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     def test_search_server_error(self, client):
-        with patch("src.routers.rag.search_rag") as mock_search:
+        with patch("src.routers.ai_chat.search_rag") as mock_search:
             mock_search.side_effect = RuntimeError("LLM timeout")
 
             response = client.post(

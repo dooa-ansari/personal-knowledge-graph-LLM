@@ -5,13 +5,13 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from src.dependencies import get_session_id
+from src.middlewares import get_session_id
 from src.schemas.convert import ConvertResponse, ErrorResponse
-from src.services.rdf_converter import convert_resume_to_rdf
+from src.services.resume_md_to_rdf import convert_resume_to_rdf
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["convert"])
+router = APIRouter(tags=["parse-resume"])
 
 # Path to the resume markdown file (in project root)
 MD_PATH = Path(__file__).resolve().parent.parent.parent / "All Details Resume.md"

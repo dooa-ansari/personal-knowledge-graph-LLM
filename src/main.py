@@ -2,13 +2,13 @@
 
 from fastapi import FastAPI
 
-from src.dependencies import SessionEnforcerMiddleware
-from src.routers import convert, rag
+from src.middlewares import SessionEnforcerMiddleware
+from src.routers import parse_resume, ai_chat
 
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Resume RDF Converter API",
+        title="Knowledge Graph API",
         version="1.0.0",
         description="API to convert resume markdown files to RDF and perform semantic RAG search.",
     )
@@ -17,8 +17,8 @@ def create_app() -> FastAPI:
     app.add_middleware(SessionEnforcerMiddleware)
 
     # Routers
-    app.include_router(convert.router, prefix="/api")
-    app.include_router(rag.router, prefix="/api")
+    app.include_router(parse_resume.router, prefix="/api")
+    app.include_router(ai_chat.router, prefix="/api")
 
     return app
 

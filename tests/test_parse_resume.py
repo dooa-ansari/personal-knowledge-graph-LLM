@@ -7,7 +7,7 @@ from fastapi import status
 
 class TestConvertResume:
     def test_convert_success(self, client):
-        with patch("src.routers.convert.convert_resume_to_rdf") as mock_convert:
+        with patch("src.routers.parse_resume.convert_resume_to_rdf") as mock_convert:
             mock_convert.return_value = "/fake/path/resume.ttl"
 
             response = client.post("/api/convert-resume")
@@ -18,7 +18,7 @@ class TestConvertResume:
         assert data["rdf_file"] == "/fake/path/resume.ttl"
 
     def test_convert_file_not_found(self, client):
-        with patch("src.routers.convert.convert_resume_to_rdf") as mock_convert:
+        with patch("src.routers.parse_resume.convert_resume_to_rdf") as mock_convert:
             mock_convert.side_effect = FileNotFoundError("File not found: /fake/resume.md")
 
             response = client.post("/api/convert-resume")
@@ -27,7 +27,7 @@ class TestConvertResume:
         assert "File not found" in response.json()["detail"]
 
     def test_convert_server_error(self, client):
-        with patch("src.routers.convert.convert_resume_to_rdf") as mock_convert:
+        with patch("src.routers.parse_resume.convert_resume_to_rdf") as mock_convert:
             mock_convert.side_effect = RuntimeError("Something broke")
 
             response = client.post("/api/convert-resume")

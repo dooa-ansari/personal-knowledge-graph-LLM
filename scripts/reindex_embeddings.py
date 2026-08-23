@@ -1,6 +1,5 @@
 """Rebuild the ChromaDB RAG index from the Turtle resume graph."""
 
-import argparse
 import logging
 import sys
 from pathlib import Path
@@ -15,12 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Rebuild the ChromaDB RAG index.")
-    parser.add_argument("--rdf-file", help="Optional path to a Turtle file.")
-    args = parser.parse_args()
-
     try:
-        count = reindex_rag(args.rdf_file)
+        count = reindex_rag()
         print(f"Indexed {count} resume chunks.")
     except Exception as exc:
         logger.error("Reindex failed: %s", exc)

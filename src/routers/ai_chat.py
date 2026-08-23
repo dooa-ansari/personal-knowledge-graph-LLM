@@ -4,14 +4,14 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from src.dependencies import get_session_id
+from src.middlewares import get_session_id
 from src.schemas.convert import ErrorResponse
 from src.schemas.rag import RagSearchRequest, RagSearchResponse
-from src.services.rag_service import search_rag
+from src.services.ai_chat_rag_service import search_rag
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["rag"])
+router = APIRouter(tags=["ai-chat"])
 
 
 @router.post(
