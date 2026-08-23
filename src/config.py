@@ -32,8 +32,15 @@ RAG_COLLECTION_NAME = os.getenv("RAG_COLLECTION_NAME", "resume_chunks")
 RAG_TOP_K = int(os.getenv("RAG_TOP_K", "2"))
 
 # ---------------------------------------------------------------------------
-# Session
+# CORS
 # ---------------------------------------------------------------------------
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(",")
+    if origin.strip()
+]
 SECRET_KEY = os.getenv(
     "SECRET_KEY",
     "django-insecure-h%1+fp@78b79ff$k&m*1c49afrf%ex$cv!v329-_1t3_c5&sza",
