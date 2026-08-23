@@ -7,7 +7,7 @@ from typing import TypedDict
 from rdflib import Graph, Literal, RDF
 
 from src import config
-from src.clients import create_embeddings, get_chroma_client, require_api_key
+from src.utils import create_embeddings, get_chroma_client, require_api_key
 
 logger = logging.getLogger(__name__)
 

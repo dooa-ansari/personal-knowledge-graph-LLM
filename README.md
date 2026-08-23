@@ -20,7 +20,7 @@ Instead of dumping raw documents or bloated text chunks into an LLM context wind
 - **Backend:** Python, FastAPI
 - **Semantic Graph Engine:** `rdflib` 7.1 (RDF parsing and SPARQL 1.1 engine)
 - **LLM Orchestration:** OpenAI-compatible API via OpenRouter (`requests` library)
-- **AI Model:** Inclusion AI Ling 3.0 Flash via OpenRouter (`inclusionai/ling-3.0-flash`) — configured centrally in `src/services/model_config.py`
+- **AI Model:** Inclusion AI Ling 3.0 Flash via OpenRouter (`inclusionai/ling-3.0-flash`) — configurable via `DEFAULT_MODEL` in `src/config.py` / `.env`
 - **Vector Retrieval:** ChromaDB persistent collection with OpenRouter embeddings
 - **RAG Orchestration:** Simple sequential workflow (no LangGraph dependency)
 - **API Documentation:** Auto-generated OpenAPI via FastAPI + Pydantic
@@ -55,28 +55,27 @@ personal-knowledge-graph/
 ├── All Details Resume.ttl      # Generated RDF knowledge graph
 ├── chroma/                     # ChromaDB persistent storage (or data/chroma/)
 ├── scripts/
-│   └── reindex.py              # CLI to rebuild the RAG index
+│   └── reindex_embeddings.py   # CLI to rebuild the ChromaDB RAG index
 ├── src/
 │   ├── main.py                 # FastAPI app factory
 │   ├── config.py               # Central configuration (env vars)
-│   ├── clients.py              # ChromaDB & OpenAI client factories
-│   ├── dependencies.py         # Session middleware + FastAPI Depends()
+│   ├── utils.py                # ChromaDB & OpenAI client factories & helpers
+│   ├── middlewares.py          # Session middleware + session validation helper
 │   ├── routers/
-│   │   ├── convert.py          # POST /api/convert-resume
-│   │   └── rag.py              # POST /api/search-rag
+│   │   ├── parse_resume.py     # POST /api/convert-resume
+│   │   └── ai_chat.py          # POST /api/search-rag
 │   ├── schemas/
 │   │   ├── convert.py          # ConvertResponse, ErrorResponse
 │   │   └── rag.py              # RagSearchRequest/Response, RagChunk
 │   └── services/
-│       ├── model_config.py     # Central model configuration
 │       ├── openrouter_service.py  # OpenRouter LLM client
-│       ├── rag_service.py      # Session-aware RAG workflow
+│       ├── ai_chat_rag_service.py # Session-aware RAG workflow
 │       ├── rag_indexer.py      # RDF entities → vector chunks
-│       └── rdf_converter.py    # Resume markdown → RDF converter
+│       └── resume_md_to_rdf.py # Resume markdown → RDF converter
 └── tests/
     ├── conftest.py             # Test fixtures
-    ├── test_convert.py         # Convert endpoint tests
-    └── test_rag.py             # RAG endpoint tests
+    ├── test_parse_resume.py    # Parse resume endpoint tests
+    └── test_ai_chat.py         # AI chat RAG endpoint tests
 ```
 
 ---
@@ -113,7 +112,7 @@ personal-knowledge-graph/
 
 4. **Build the RAG index:**
    ```bash
-   uv run python -m scripts.reindex
+   uv run python -m scripts.reindex_embeddings
    ```
 
    Re-run this command whenever `All Details Resume.ttl` or the chunking logic changes.
@@ -206,7 +205,7 @@ flowchart TD
 
 ## RAG Workflow (Session-aware)
 
-The `/api/search-rag` endpoint uses a simple sequential workflow in `src/services/rag_service.py`:
+The `/api/search-rag` endpoint uses a simple sequential workflow in `src/services/ai_chat_rag_service.py`:
 
 ```mermaid
 flowchart TD
@@ -288,6 +287,7 @@ uv run pytest -v
 |----------|-------------|---------|
 | `OPENROUTER_BASE_URL` | OpenRouter API base URL | `https://openrouter.ai/api/v1` |
 | `OPENROUTER_API_KEY` | Your OpenRouter API key | (required) |
+| `DEFAULT_MODEL` | OpenRouter LLM model for RAG & query rewriting | `inclusionai/ling-3.0-flash` |
 | `EMBEDDING_MODEL` | OpenRouter-compatible embedding model | `openai/text-embedding-3-small` |
 | `CHROMA_PERSIST_PATH` | Persistent ChromaDB storage path | `./chroma` |
 | `RAG_COLLECTION_NAME` | ChromaDB collection name | `resume_chunks` |

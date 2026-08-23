@@ -7,16 +7,15 @@ import logging
 import requests
 
 from src import config
-from src.clients import require_api_key
-from src.services.model_config import DEFAULT_MODEL
+from src.utils import require_api_key
 
 logger = logging.getLogger(__name__)
 
 
 def query_openrouter(
     prompt: str,
-    model: str = DEFAULT_MODEL,
-    system_prompt: str = None,
+    model: str = config.DEFAULT_MODEL,
+    system_prompt: str = '',
 ) -> str:
     """Send a prompt to OpenRouter API and return the model's response."""
     api_key = require_api_key()
@@ -32,6 +31,7 @@ def query_openrouter(
     messages = []
     if system_prompt:
         messages.append({"role": "system", "content": system_prompt})
+
     messages.append({"role": "user", "content": prompt})
 
     payload = {"model": model, "messages": messages}
