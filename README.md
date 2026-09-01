@@ -22,10 +22,11 @@ Instead of dumping raw documents or bloated text chunks into an LLM context wind
 - **LLM Orchestration:** OpenAI-compatible API via OpenRouter (`requests` library)
 - **AI Model:** Inclusion AI Ling 3.0 Flash via OpenRouter (`inclusionai/ling-3.0-flash`) — configurable via `DEFAULT_MODEL` in `src/config.py` / `.env`
 - **Vector Retrieval:** ChromaDB persistent collection with OpenRouter embeddings
+- **Session Store:** Redis (chat history + TTL-based expiry)
 - **RAG Orchestration:** Simple sequential workflow (no LangGraph dependency)
 - **API Documentation:** Auto-generated OpenAPI via FastAPI + Pydantic
 - **Environment Management:** `python-dotenv`
-- **Session Management:** Cookie-based anonymous sessions (HttpOnly, SameSite=Strict) via Starlette middleware
+- **Session Management:** Cookie-based anonymous sessions via Starlette middleware
 - **Package Manager:** uv
 
 ---
@@ -46,36 +47,42 @@ FastAPI was chosen as the backend framework for this service due to several arch
 
 ```
 personal-knowledge-graph/
-├── pyproject.toml              # Project metadata & dependencies (uv)
-├── uv.lock                     # Locked dependency versions
-├── .env                        # OpenRouter API config (git-ignored)
-├── .env.example                # Template for .env
+├── .github/workflows/
+│   └── pr-tests.yml               # CI: run tests on PRs to main
+├── pyproject.toml                 # Project metadata & dependencies (uv)
+├── uv.lock                        # Locked dependency versions
+├── Dockerfile
+├── docker-compose.yml             # API + Redis + Chroma services
+├── .env                           # OpenRouter API config (git-ignored)
+├── .env.example                   # Template for .env
 ├── .gitignore
-├── All Details Resume.md       # Source resume markdown file
-├── All Details Resume.ttl      # Generated RDF knowledge graph
-├── chroma/                     # ChromaDB persistent storage (or data/chroma/)
+├── All Details Resume.md          # Source resume markdown file
+├── All Details Resume.ttl         # Generated RDF knowledge graph
+├── chroma/                        # Local ChromaDB persistent storage (dev)
 ├── scripts/
-│   └── reindex_embeddings.py   # CLI to rebuild the ChromaDB RAG index
+│   └── reindex_embeddings.py      # CLI to rebuild the ChromaDB RAG index
 ├── src/
-│   ├── main.py                 # FastAPI app factory
-│   ├── config.py               # Central configuration (env vars)
-│   ├── utils.py                # ChromaDB & OpenAI client factories & helpers
-│   ├── middlewares.py          # Session middleware + session validation helper
+│   ├── main.py                    # FastAPI app factory
+│   ├── config.py                  # Central configuration (env vars)
+│   ├── utils.py                   # ChromaDB/OpenAI/Redis client helpers
+│   ├── middlewares.py             # Session middleware + session validation helper
 │   ├── routers/
-│   │   ├── parse_resume.py     # POST /api/convert-resume
-│   │   └── ai_chat.py          # POST /api/search-rag
+│   │   ├── parse_resume.py        # POST /api/convert-resume
+│   │   └── ai_chat.py             # POST /api/search-rag
 │   ├── schemas/
-│   │   ├── convert.py          # ConvertResponse, ErrorResponse
-│   │   └── rag.py              # RagSearchRequest/Response, RagChunk
+│   │   ├── convert.py             # ConvertResponse, ErrorResponse
+│   │   └── rag.py                 # RagSearchRequest/Response, RagChunk
 │   └── services/
 │       ├── openrouter_service.py  # OpenRouter LLM client
 │       ├── ai_chat_rag_service.py # Session-aware RAG workflow
-│       ├── rag_indexer.py      # RDF entities → vector chunks
-│       └── resume_md_to_rdf.py # Resume markdown → RDF converter
+│       ├── rag_indexer.py         # RDF entities → vector chunks
+│       └── resume_md_to_rdf.py    # Resume markdown → RDF converter
 └── tests/
-    ├── conftest.py             # Test fixtures
-    ├── test_parse_resume.py    # Parse resume endpoint tests
-    └── test_ai_chat.py         # AI chat RAG endpoint tests
+    ├── conftest.py
+    ├── test_parse_resume.py
+    ├── test_ai_chat.py
+    ├── test_ai_chat_rag_service.py
+    └── test_ai_chat_integration.py
 ```
 
 ---
@@ -129,6 +136,17 @@ uv run uvicorn src.main:app --reload
 
 The server starts at `http://127.0.0.1:8000/`. Interactive API docs at `http://127.0.0.1:8000/docs`.
 
+### Run with Docker Compose (API + Redis + Chroma)
+
+```bash
+docker compose up --build
+```
+
+- API: `http://127.0.0.1:8000`
+- Redis and Chroma run as internal services (not exposed to host/public ports).
+
+> Note: Chroma is deployed as a separate container with persistent volume storage.
+
 ### Generate the RDF knowledge graph
 
 ```bash
@@ -176,12 +194,13 @@ curl -X POST http://127.0.0.1:8000/api/search-rag \
 
 ### Anonymous Session Enforcement
 
-Every API request requires a valid anonymous session. The `SessionEnforcerMiddleware` automatically creates a browser-session cookie on the first visit. The `get_session_id` dependency rejects requests without a valid session with HTTP 403.
+Every API request uses an anonymous session cookie. The `SessionEnforcerMiddleware` auto-creates a cookie for new visitors, and the same cookie is reused for follow-up prompts.
+
+Chat history is stored in Redis and expires with TTL (`SESSION_TTL_SECONDS`, default 900 seconds).
 
 **Session cookie properties:**
 - **HttpOnly** — inaccessible to JavaScript (prevents XSS cookie theft)
 - **SameSite=Strict** — only sent for same-site requests (blocks CSRF)
-- **Expires on browser close** — one-time session enforcement
 
 ---
 
@@ -214,8 +233,8 @@ flowchart TD
     Retrieve --> Answer["🟣 answer<br/>LLM uses conversation + retrieved context<br/>grounded response"]
     Answer --> End["🔴 END<br/>answer + retrieval_query + chunks"]
 
-    subgraph Memory["In-Memory Session Store"]
-        State["message history<br/>(user + assistant turns)"]
+    subgraph Memory["Redis Session Store"]
+        State["message history<br/>(user + assistant turns + TTL)"]
     end
 
     State -.-> Rewrite
@@ -236,6 +255,11 @@ flowchart TD
 ```bash
 uv run pytest -v
 ```
+
+### CI (GitHub Actions)
+
+Pull requests targeting `main` automatically run the test suite via:
+- `.github/workflows/pr-tests.yml`
 
 ---
 
@@ -275,6 +299,7 @@ uv run pytest -v
 | Uvicorn | ASGI server |
 | rdflib | RDF parsing & SPARQL engine |
 | chromadb | Persistent vector database |
+| redis | Session chat history store with TTL |
 | openai | OpenRouter-compatible embeddings client |
 | python-dotenv | Environment variable loading |
 | httpx | HTTP client (testing) |
@@ -292,6 +317,9 @@ uv run pytest -v
 | `CHROMA_PERSIST_PATH` | Persistent ChromaDB storage path | `./chroma` |
 | `RAG_COLLECTION_NAME` | ChromaDB collection name | `resume_chunks` |
 | `RAG_TOP_K` | Number of chunks passed to the RAG answer model | `2` |
+| `REDIS_PASSWORD` | Redis password used by Docker Compose Redis service | (required in Docker Compose) |
+| `REDIS_URL` | Redis connection URL for session history | `redis://localhost:6379/0` |
+| `SESSION_TTL_SECONDS` | Session message history TTL in Redis (seconds) | `900` |
 
 ---
 

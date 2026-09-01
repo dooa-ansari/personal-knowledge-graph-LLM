@@ -1,10 +1,11 @@
 """Simplified session-aware semantic RAG workflow."""
 
+import json
 import logging
 from typing import TypedDict, cast
 
 from src import config
-from src.utils import create_embeddings, get_chroma_client
+from src.utils import create_embeddings, get_chroma_client, get_redis_client
 from src.services.openrouter_service import query_openrouter
 
 logger = logging.getLogger(__name__)
@@ -20,7 +21,47 @@ Return only a concise natural-language answer.
 """.strip()
 
 
-_session_store: dict[str, list[dict[str, str]]] = {}
+_redis = get_redis_client()
+
+
+def _session_key(session_id: str) -> str:
+    return f"chat:{session_id}"
+
+
+def _get_session_messages(session_id: str) -> list[dict[str, str]]:
+    try:
+        raw = _redis.get(_session_key(session_id))
+    except Exception as exc:
+        raise RuntimeError("Failed to read session history from Redis.") from exc
+
+    if not raw:
+        return []
+
+    try:
+        messages = json.loads(raw)
+    except json.JSONDecodeError:
+        logger.warning("Invalid JSON in Redis chat history for session=%s", session_id)
+        return []
+
+    if not isinstance(messages, list):
+        return []
+    return messages
+
+
+def _save_session_messages(session_id: str, messages: list[dict[str, str]]) -> None:
+    key = _session_key(session_id)
+    payload = json.dumps(messages)
+
+    try:
+        ttl = _redis.ttl(key)
+        if ttl == -2:
+            _redis.set(key, payload, ex=config.SESSION_TTL_SECONDS)
+        elif ttl > 0:
+            _redis.set(key, payload, ex=ttl)
+        else:
+            _redis.set(key, payload, ex=config.SESSION_TTL_SECONDS)
+    except Exception as exc:
+        raise RuntimeError("Failed to write session history to Redis.") from exc
 
 
 class RetrievedChunk(TypedDict):
@@ -120,7 +161,7 @@ def search_rag(session_id: str, prompt: str) -> RagResult:
     if not prompt.strip():
         raise ValueError("Prompt is required.")
 
-    messages = _session_store.get(session_id, [])
+    messages = _get_session_messages(session_id)
     history = "\n".join(
         f"{msg['role']}: {msg['content']}" for msg in messages
     )
@@ -141,7 +182,7 @@ def search_rag(session_id: str, prompt: str) -> RagResult:
 
     messages.append({"role": "user", "content": prompt.strip()})
     messages.append({"role": "assistant", "content": answer})
-    _session_store[session_id] = messages
+    _save_session_messages(session_id, messages)
 
     return {
         "prompt": prompt.strip(),

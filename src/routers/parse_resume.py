@@ -37,6 +37,6 @@ def convert_resume(session_id: str = Depends(get_session_id)):
     except FileNotFoundError as e:
         logger.warning("Resume file not found: %s", e)
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
+    except Exception:
         logger.exception("Failed to convert resume to RDF")
-        raise HTTPException(status_code=500, detail=f"Failed to convert resume to RDF: {e}")
+        raise HTTPException(status_code=500, detail="Failed to convert resume to RDF.")

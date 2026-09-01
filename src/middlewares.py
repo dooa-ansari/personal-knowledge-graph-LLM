@@ -3,7 +3,7 @@
 import uuid
 import logging
 
-from fastapi import Cookie, HTTPException, Request, Response
+from fastapi import Cookie, HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from src import config
@@ -18,8 +18,18 @@ SESSION_EXEMPT_PATHS = {"/docs", "/openapi.json"}
 # Middleware — auto-create anonymous session cookie on first visit
 # ---------------------------------------------------------------------------
 
+def _is_valid_session_id(session_id: str) -> bool:
+    if not session_id:
+        return False
+    try:
+        uuid.UUID(session_id)
+        return True
+    except ValueError:
+        return False
+
+
 class SessionEnforcerMiddleware(BaseHTTPMiddleware):
-    """Ensure every visitor has a session cookie. Creates one if missing."""
+    """Ensure every visitor has a valid session cookie. Rotate if invalid/missing."""
 
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
@@ -27,17 +37,23 @@ class SessionEnforcerMiddleware(BaseHTTPMiddleware):
             if path.startswith(exempt):
                 return await call_next(request)
 
-        response = await call_next(request)
-        if SESSION_COOKIE not in request.cookies:
+        incoming_session_id = request.cookies.get(SESSION_COOKIE, "")
+        if _is_valid_session_id(incoming_session_id):
+            session_id = incoming_session_id
+        else:
             session_id = uuid.uuid4().hex
-            response.set_cookie(
-                key=SESSION_COOKIE,
-                value=session_id,
-                httponly=True,
-                samesite="strict",
-                max_age=None,  # browser-session cookie
-            )
             logger.debug("Created anonymous session: %s", session_id)
+
+        request.state.session_id = session_id
+        response = await call_next(request)
+        response.set_cookie(
+            key=SESSION_COOKIE,
+            value=session_id,
+            httponly=True,
+            samesite="strict",
+            secure=config.SESSION_COOKIE_SECURE,
+            max_age=config.SESSION_TTL_SECONDS,
+        )
         return response
 
 
@@ -45,11 +61,17 @@ class SessionEnforcerMiddleware(BaseHTTPMiddleware):
 # Dependency — require a valid session cookie
 # ---------------------------------------------------------------------------
 
-def get_session_id(session_id: str = Cookie(default="", alias=SESSION_COOKIE)) -> str:
+def get_session_id(
+    request: Request,
+    session_id: str = Cookie(default="", alias=SESSION_COOKIE),
+) -> str:
     """FastAPI dependency: extract and validate the session cookie."""
-    if not session_id:
-        raise HTTPException(status_code=403, detail="No valid session found. Please refresh the page.")
-    return session_id
+    state_session_id = getattr(request.state, "session_id", "")
+    if _is_valid_session_id(state_session_id):
+        return state_session_id
+    if _is_valid_session_id(session_id):
+        return session_id
+    raise HTTPException(status_code=403, detail="No valid session found. Please refresh the page.")
 
 
 # ---------------------------------------------------------------------------

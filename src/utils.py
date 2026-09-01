@@ -4,6 +4,9 @@ Shared client factories for ChromaDB and OpenAI-compatible embeddings.
 
 import logging
 import os
+from typing import Any
+
+import redis
 
 os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 
@@ -50,3 +53,8 @@ def create_embeddings(texts: list[str]) -> CreateEmbeddingResponse:
         model=config.EMBEDDING_MODEL,
         input=texts,
     )
+
+
+def get_redis_client() -> Any:
+    """Create a Redis client for session-backed chat history."""
+    return redis.from_url(config.REDIS_URL, decode_responses=True)
