@@ -2,9 +2,13 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi import _rate_limit_exceeded_handler
 
 from src import config
 from src.middlewares import SessionEnforcerMiddleware
+from src.rate_limiter import limiter
 from src.routers import parse_resume, ai_chat
 
 
@@ -26,6 +30,11 @@ def create_app() -> FastAPI:
 
     # Middleware — auto-create session cookie
     app.add_middleware(SessionEnforcerMiddleware)
+
+    # Rate limiting
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    app.add_middleware(SlowAPIMiddleware)
 
     # Routers
     app.include_router(parse_resume.router, prefix="/api")

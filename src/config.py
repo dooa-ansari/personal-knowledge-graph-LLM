@@ -30,11 +30,19 @@ CHROMA_PERSIST_PATH = os.getenv(
 )
 RAG_COLLECTION_NAME = os.getenv("RAG_COLLECTION_NAME", "resume_chunks")
 RAG_TOP_K = int(os.getenv("RAG_TOP_K", "2"))
+RAG_SEARCH_RATE_LIMIT = os.getenv("RAG_SEARCH_RATE_LIMIT", "30/minute")
+
+def _as_bool(value: str | None, default: bool) -> bool:
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
 
 # ---------------------------------------------------------------------------
 # Sessions
 # ---------------------------------------------------------------------------
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "900"))
+SESSION_COOKIE_SECURE = _as_bool(os.getenv("SESSION_COOKIE_SECURE"), False)
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 # ---------------------------------------------------------------------------

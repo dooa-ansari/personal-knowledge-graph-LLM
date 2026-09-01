@@ -10,7 +10,7 @@ class TestSearchRag:
     def test_search_success(self, client):
         mock_result = {
             "prompt": "What skills does the candidate have?",
-            "session_id": "test-session-123",
+            "session_id": "123e4567-e89b-12d3-a456-426614174000",
             "model": "inclusionai/ling-3.0-flash",
             "retrieval_query": "candidate skills",
             "answer": "The candidate has Python and React skills.",
@@ -55,7 +55,7 @@ class TestSearchRag:
             )
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert "LLM timeout" in response.json()["detail"]
+        assert response.json()["detail"] == "Failed to perform RAG search."
 
     def test_search_openrouter_rate_limit_returns_429(self, client):
         with patch("src.routers.ai_chat.search_rag") as mock_search:
@@ -78,8 +78,20 @@ class TestSearchRag:
         app = create_app()
         client_no_cookie = TestClient(app)
 
-        response = client_no_cookie.post(
-            "/api/search-rag",
-            json={"prompt": "What skills?"},
-        )
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        with patch("src.routers.ai_chat.search_rag") as mock_search:
+            mock_search.return_value = {
+                "prompt": "What skills?",
+                "session_id": "123e4567-e89b-12d3-a456-426614174000",
+                "model": "inclusionai/ling-3.0-flash",
+                "retrieval_query": "what skills",
+                "answer": "answer",
+                "retrieved_chunks": [],
+            }
+
+            response = client_no_cookie.post(
+                "/api/search-rag",
+                json={"prompt": "What skills?"},
+            )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.cookies.get("session_id")

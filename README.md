@@ -143,10 +143,9 @@ docker compose up --build
 ```
 
 - API: `http://127.0.0.1:8000`
-- Chroma service: `http://127.0.0.1:8001`
-- Redis: `127.0.0.1:6379`
+- Redis and Chroma run as internal services (not exposed to host/public ports).
 
-> Note: Chroma is now deployed as a separate container with persistent volume storage.
+> Note: Chroma is deployed as a separate container with persistent volume storage.
 
 ### Generate the RDF knowledge graph
 
@@ -318,6 +317,7 @@ Pull requests targeting `main` automatically run the test suite via:
 | `CHROMA_PERSIST_PATH` | Persistent ChromaDB storage path | `./chroma` |
 | `RAG_COLLECTION_NAME` | ChromaDB collection name | `resume_chunks` |
 | `RAG_TOP_K` | Number of chunks passed to the RAG answer model | `2` |
+| `REDIS_PASSWORD` | Redis password used by Docker Compose Redis service | (required in Docker Compose) |
 | `REDIS_URL` | Redis connection URL for session history | `redis://localhost:6379/0` |
 | `SESSION_TTL_SECONDS` | Session message history TTL in Redis (seconds) | `900` |
 

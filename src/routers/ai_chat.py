@@ -4,9 +4,11 @@ import logging
 
 import requests
 from openai import RateLimitError
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
+from src import config
 from src.middlewares import get_session_id
+from src.rate_limiter import limiter
 from src.schemas.convert import ErrorResponse
 from src.schemas.rag import RagSearchRequest, RagSearchResponse
 from src.services.ai_chat_rag_service import search_rag
@@ -19,10 +21,12 @@ router = APIRouter(tags=["ai-chat"])
 @router.post(
     "/search-rag",
     response_model=RagSearchResponse,
-    responses={400: {"model": ErrorResponse}, 500: {"model": ErrorResponse}},
+    responses={400: {"model": ErrorResponse}, 429: {"model": ErrorResponse}, 500: {"model": ErrorResponse}},
     summary="Semantic RAG resume search",
 )
+@limiter.limit(config.RAG_SEARCH_RATE_LIMIT)
 def search_rag_endpoint(
+    request: Request,
     body: RagSearchRequest,
     session_id: str = Depends(get_session_id),
 ):
@@ -40,10 +44,10 @@ def search_rag_endpoint(
             logger.warning("RAG upstream rate limited by OpenRouter")
             raise HTTPException(status_code=429, detail="OpenRouter rate limit exceeded. Please retry shortly.")
         logger.exception("RAG search failed with upstream HTTP error")
-        raise HTTPException(status_code=500, detail=f"Failed to perform RAG search: {exc}")
+        raise HTTPException(status_code=500, detail="Failed to perform RAG search.")
     except RateLimitError:
         logger.warning("RAG upstream rate limited by OpenRouter")
         raise HTTPException(status_code=429, detail="OpenRouter rate limit exceeded. Please retry shortly.")
-    except Exception as exc:
+    except Exception:
         logger.exception("RAG search failed")
-        raise HTTPException(status_code=500, detail=f"Failed to perform RAG search: {exc}")
+        raise HTTPException(status_code=500, detail="Failed to perform RAG search.")

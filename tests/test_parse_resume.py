@@ -33,7 +33,7 @@ class TestConvertResume:
             response = client.post("/api/convert-resume")
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-        assert "Something broke" in response.json()["detail"]
+        assert response.json()["detail"] == "Failed to convert resume to RDF."
 
     def test_convert_missing_session(self):
         from src.main import create_app
@@ -42,5 +42,9 @@ class TestConvertResume:
         app = create_app()
         client_no_cookie = TestClient(app)
 
-        response = client_no_cookie.post("/api/convert-resume")
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        with patch("src.routers.parse_resume.convert_resume_to_rdf") as mock_convert:
+            mock_convert.return_value = "/fake/path/resume.ttl"
+            response = client_no_cookie.post("/api/convert-resume")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.cookies.get("session_id")
