@@ -4,6 +4,13 @@ services:
     ports:
       - "6379:6379"
 
+  chroma:
+    image: chromadb/chroma:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+
   api:
     build: .
     ports:
@@ -12,5 +19,11 @@ services:
       - .env
     environment:
       REDIS_URL: redis://redis:6379/0
+      CHROMA_HOST: chroma
+      CHROMA_PORT: 8000
     depends_on:
       - redis
+      - chroma
+
+volumes:
+  chroma_data:
