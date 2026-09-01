@@ -32,6 +32,12 @@ RAG_COLLECTION_NAME = os.getenv("RAG_COLLECTION_NAME", "resume_chunks")
 RAG_TOP_K = int(os.getenv("RAG_TOP_K", "2"))
 
 # ---------------------------------------------------------------------------
+# Sessions
+# ---------------------------------------------------------------------------
+SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "900"))
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
+# ---------------------------------------------------------------------------
 # CORS
 # ---------------------------------------------------------------------------
 CORS_ORIGINS = [
