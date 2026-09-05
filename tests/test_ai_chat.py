@@ -41,6 +41,10 @@ class TestSearchRag:
         response = client.post("/api/search-rag", json={"prompt": ""})
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
+    def test_search_prompt_too_long(self, client):
+        response = client.post("/api/search-rag", json={"prompt": "x" * 1001})
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
     def test_search_missing_prompt_field(self, client):
         response = client.post("/api/search-rag", json={})
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

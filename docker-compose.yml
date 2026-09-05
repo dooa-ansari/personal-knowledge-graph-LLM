@@ -2,11 +2,7 @@ services:
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
-
-  chroma:
-    image: chromadb/chroma:latest
-    volumes:
-      - chroma_data:/chroma/chroma
+    restart: unless-stopped
 
   api:
     build: .
@@ -16,11 +12,11 @@ services:
       - .env
     environment:
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
-      CHROMA_HOST: chroma
-      CHROMA_PORT: 8000
+    volumes:
+      - chroma_data:/app/chroma
     depends_on:
       - redis
-      - chroma
+    restart: unless-stopped
 
 volumes:
   chroma_data:
