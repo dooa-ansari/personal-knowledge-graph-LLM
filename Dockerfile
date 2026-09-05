@@ -9,4 +9,9 @@ RUN uv sync --no-dev
 
 EXPOSE 8000
 
-CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Railway injects PORT at runtime; the default keeps local/compose usage on 8000.
+ENV PORT=8000
+# Rebuild the RAG index on container start (requires OPENROUTER_API_KEY).
+ENV REINDEX_ON_START=true
+
+ENTRYPOINT ["sh", "scripts/entrypoint.sh"]

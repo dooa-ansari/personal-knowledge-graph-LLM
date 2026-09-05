@@ -62,7 +62,8 @@ personal-knowledge-graph/
 ├── All Details Resume.ttl         # Generated RDF knowledge graph
 ├── chroma/                        # Local ChromaDB persistent storage (dev)
 ├── scripts/
-│   └── reindex_embeddings.py      # CLI to rebuild the ChromaDB RAG index
+│   ├── reindex_embeddings.py      # CLI to rebuild the ChromaDB RAG index
+│   └── entrypoint.sh              # Container entrypoint (reindex + uvicorn, honors $PORT)
 ├── src/
 │   ├── main.py                    # FastAPI app factory
 │   ├── config.py                  # Central configuration (env vars)
@@ -147,7 +148,7 @@ docker compose up --build
 - API: `http://127.0.0.1:8000`
 - Redis runs as an internal service (not exposed to host/public ports).
 
-> Note: ChromaDB runs embedded inside the API container. Its index is persisted in the `chroma_data` Docker volume mounted at `/app/chroma`, and the deploy workflow reindexes it automatically after each deploy.
+> Note: ChromaDB runs embedded inside the API container. Its index is persisted in the `chroma_data` Docker volume mounted at `/app/chroma`, and the container entrypoint (`scripts/entrypoint.sh`) rebuilds it on startup (`REINDEX_ON_START=true` by default).
 
 ### Generate the RDF knowledge graph
 
@@ -178,6 +179,24 @@ curl -X POST http://127.0.0.1:8000/api/search-rag \
   -b cookies.txt \
   -d '{"prompt": "What did she do there?"}'
 ```
+
+---
+
+## ☁️ Deployment (Railway)
+
+Deploys run **directly on Railway** from this repository — no CI deploy workflow is needed. Railway detects the `Dockerfile`, and every push to `main` builds and ships a new container.
+
+1. **Connect the repo**: Railway → New Project → Deploy from GitHub repo (install the Railway GitHub App if prompted).
+2. **Add Redis**: New → Database → **Redis**. Then on the API service, add variable `REDIS_URL` referencing the Redis service: `${{Redis.RAILWAY_REDIS_FULL_INTERNAL_URL}}`.
+3. **Add a Volume** to the API service, mount path `/app/chroma` — this persists the ChromaDB index across restarts (it is rebuilt automatically on container start anyway).
+4. **Set service variables** (API service → Variables):
+   - `OPENROUTER_API_KEY` (secret)
+   - `SESSION_COOKIE_SECURE=true` (Railway domains are HTTPS; required for the cross-site session cookie)
+   - `CORS_ORIGINS=https://<your-frontend-origin>` (e.g. your Vercel or GitHub Pages URL)
+5. **Expose HTTPS**: API service → Settings → Networking → *Generate Public Domain*. Railway's edge terminates TLS — no Caddy/reverse-proxy config needed (the compose `tls` profile is only for local experiments).
+6. **RAG indexing** happens automatically at container start via `scripts/entrypoint.sh`; set `REINDEX_ON_START=false` to skip and run `railway run python -m scripts.reindex_embeddings` manually instead.
+
+The frontend (Vercel/GitHub Pages) calls `https://<railway-domain>/api/...` with `credentials: "include"`.
 
 ---
 
