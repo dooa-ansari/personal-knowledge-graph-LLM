@@ -1,0 +1,68 @@
+name: Deploy to UpCloud
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Only one deploy at a time; cancel a superseded run.
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build & start stack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          # Forward these runner env vars into the remote shell.
+          envs: OPENROUTER_API_KEY,REDIS_PASSWORD,CORS_ORIGINS,SESSION_COOKIE_SECURE
+          # Everything below runs ON the server.
+          script: |
+            set -euo pipefail
+            cd ~/personal-knowledge-graph
+
+            # Pull the latest code (server keeps a real git clone).
+            git pull --ff-only
+
+            # Fail fast if required secrets are missing.
+            : "${OPENROUTER_API_KEY:?OPENROUTER_API_KEY secret is not set}"
+            : "${REDIS_PASSWORD:?REDIS_PASSWORD secret is not set}"
+
+            # Write runtime env from GitHub Secrets/Variables (never committed to git).
+            cat > .env <<EOF
+            OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+            REDIS_PASSWORD=${REDIS_PASSWORD}
+            CORS_ORIGINS=${CORS_ORIGINS}
+            SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE}
+            EOF
+            chmod 600 .env
+
+            # Rebuild and restart the stack.
+            docker compose up --build -d
+
+            # Rebuild the RAG index (persisted in the chroma_data volume).
+            docker compose run --rm api uv run python -m scripts.reindex_embeddings
+
+            # Show status for the run log.
+            docker compose ps
+
+        env:
+          # Passed into the remote shell so the heredoc can expand them.
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          # Repo variables (Settings → Secrets and variables → Actions → Variables).
+          # CORS_ORIGINS: comma-separated frontend origins; leave unset for a
+          # same-origin (reverse-proxy) setup, which then allows no cross-origin calls.
+          CORS_ORIGINS: ${{ vars.CORS_ORIGINS }}
+          # Secure cookies require HTTPS. This deployment serves plain HTTP on
+          # port 8000, so the default is "false"; set the repo variable to
+          # "true" as soon as TLS (e.g. Caddy/nginx) is added in front.
+          SESSION_COOKIE_SECURE: ${{ vars.SESSION_COOKIE_SECURE || 'false' }}

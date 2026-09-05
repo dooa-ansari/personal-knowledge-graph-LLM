@@ -4,7 +4,12 @@ from pydantic import BaseModel, Field
 
 
 class RagSearchRequest(BaseModel):
-    prompt: str = Field(..., min_length=1, description="Question to ask about the resume")
+    prompt: str = Field(
+        ...,
+        min_length=1,
+        max_length=1000,
+        description="Question to ask about the resume (max 1000 characters)",
+    )
 
 
 class RagChunk(BaseModel):

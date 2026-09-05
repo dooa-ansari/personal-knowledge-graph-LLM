@@ -55,7 +55,3 @@ CORS_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "django-insecure-h%1+fp@78b79ff$k&m*1c49afrf%ex$cv!v329-_1t3_c5&sza",
-)

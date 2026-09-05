@@ -52,7 +52,7 @@ personal-knowledge-graph/
 ├── pyproject.toml                 # Project metadata & dependencies (uv)
 ├── uv.lock                        # Locked dependency versions
 ├── Dockerfile
-├── docker-compose.yml             # API + Redis + Chroma services
+├── docker-compose.yml             # API + Redis services
 ├── .env                           # OpenRouter API config (git-ignored)
 ├── .env.example                   # Template for .env
 ├── .gitignore
@@ -136,16 +136,16 @@ uv run uvicorn src.main:app --reload
 
 The server starts at `http://127.0.0.1:8000/`. Interactive API docs at `http://127.0.0.1:8000/docs`.
 
-### Run with Docker Compose (API + Redis + Chroma)
+### Run with Docker Compose (API + Redis)
 
 ```bash
 docker compose up --build
 ```
 
 - API: `http://127.0.0.1:8000`
-- Redis and Chroma run as internal services (not exposed to host/public ports).
+- Redis runs as an internal service (not exposed to host/public ports).
 
-> Note: Chroma is deployed as a separate container with persistent volume storage.
+> Note: ChromaDB runs embedded inside the API container. Its index is persisted in the `chroma_data` Docker volume mounted at `/app/chroma`, and the deploy workflow reindexes it automatically after each deploy.
 
 ### Generate the RDF knowledge graph
 
@@ -320,6 +320,8 @@ Pull requests targeting `main` automatically run the test suite via:
 | `REDIS_PASSWORD` | Redis password used by Docker Compose Redis service | (required in Docker Compose) |
 | `REDIS_URL` | Redis connection URL for session history | `redis://localhost:6379/0` |
 | `SESSION_TTL_SECONDS` | Session message history TTL in Redis (seconds) | `900` |
+| `CORS_ORIGINS` | Comma-separated allowed frontend origins | `http://localhost:5173,http://127.0.0.1:5173` |
+| `SESSION_COOKIE_SECURE` | Mark the session cookie `Secure` (set `true` behind HTTPS) | `false` |
 
 ---
 
