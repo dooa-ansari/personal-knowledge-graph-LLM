@@ -18,5 +18,26 @@ services:
       - redis
     restart: unless-stopped
 
+  # TLS reverse proxy. Disabled by default; enable with COMPOSE_PROFILES=tls
+  # (see .env / GitHub repo variables) once API_HOSTNAME has a DNS A record
+  # pointing at this server. Caddy auto-provisions Let's Encrypt certs.
+  # When TLS goes live: remove the api "ports" mapping above so only 80/443
+  # are exposed, and set SESSION_COOKIE_SECURE=true.
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["tls"]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    command: caddy reverse-proxy --from "${API_HOSTNAME}" --to api:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+
 volumes:
   chroma_data:
+  caddy_data:
+  caddy_config:

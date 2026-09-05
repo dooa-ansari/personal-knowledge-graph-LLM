@@ -99,3 +99,26 @@ class TestSearchRag:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.cookies.get("session_id")
+
+
+class TestSessionCookieFlags:
+    def test_samesite_strict_by_default(self):
+        from src.main import create_app
+        from fastapi.testclient import TestClient
+
+        client = TestClient(create_app())
+        response = client.get("/api/does-not-exist")
+        set_cookie = response.headers["set-cookie"].lower()
+        assert "samesite=strict" in set_cookie
+        assert "secure" not in set_cookie
+
+    def test_samesite_none_and_secure_when_cookie_secure_enabled(self):
+        from src.main import create_app
+        from fastapi.testclient import TestClient
+
+        client = TestClient(create_app())
+        with patch("src.middlewares.config.SESSION_COOKIE_SECURE", True):
+            response = client.get("/api/does-not-exist")
+        set_cookie = response.headers["set-cookie"].lower()
+        assert "samesite=none" in set_cookie
+        assert "secure" in set_cookie

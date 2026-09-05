@@ -2,6 +2,8 @@
 
 A lightweight FastAPI service that combines **RDF/Turtle (.ttl)** data modeling and session-aware **RAG** through **ChromaDB** and **OpenRouter**.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Instead of dumping raw documents or bloated text chunks into an LLM context window, this project uses the RDF graph as a precise source of structured resume data and provides a session-aware vector RAG API for grounded answers.
 
 ---
@@ -321,10 +323,14 @@ Pull requests targeting `main` automatically run the test suite via:
 | `REDIS_URL` | Redis connection URL for session history | `redis://localhost:6379/0` |
 | `SESSION_TTL_SECONDS` | Session message history TTL in Redis (seconds) | `900` |
 | `CORS_ORIGINS` | Comma-separated allowed frontend origins | `http://localhost:5173,http://127.0.0.1:5173` |
-| `SESSION_COOKIE_SECURE` | Mark the session cookie `Secure` (set `true` behind HTTPS) | `false` |
+| `SESSION_COOKIE_SECURE` | Mark the session cookie `Secure` and set `SameSite=None` (required `true` for a cross-site frontend, e.g. Vercel/GitHub Pages) | `false` |
+| `API_HOSTNAME` | Public hostname for the Caddy TLS proxy (DNS A record must point at the server) | (empty — TLS disabled) |
+| `COMPOSE_PROFILES` | Set to `tls` to start the Caddy HTTPS proxy service | (empty) |
 
 ---
 
 ## 📄 License
 
-This project is licensed under the BSD License.
+This project is licensed under the [MIT License](LICENSE).
+
+The license covers the source code (`src/`, `tests/`, `scripts/`) and build/deployment configuration. Personal content files — the resume data (`All Details Resume.md`, `All Details Resume.ttl`) — remain the author's personal content and are not licensed for reuse.
