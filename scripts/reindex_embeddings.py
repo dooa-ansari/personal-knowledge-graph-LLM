@@ -17,8 +17,10 @@ def main():
     try:
         count = reindex_rag()
         print(f"Indexed {count} resume chunks.")
-    except Exception as exc:
-        logger.error("Reindex failed: %s", exc)
+    except Exception:
+        # Full traceback incl. __cause__ chain (e.g. httpx ConnectError details)
+        # that the OpenAI SDK hides behind a bare "Connection error."
+        logger.exception("Reindex failed")
         sys.exit(1)
 
 
