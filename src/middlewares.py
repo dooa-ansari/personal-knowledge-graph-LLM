@@ -50,7 +50,10 @@ class SessionEnforcerMiddleware(BaseHTTPMiddleware):
             key=SESSION_COOKIE,
             value=session_id,
             httponly=True,
-            samesite="strict",
+            # Browsers reject SameSite=None without Secure. Cross-site setups
+            # (e.g. Vercel/GitHub Pages frontend -> UpCloud API) need None+Secure,
+            # which requires the API to serve over HTTPS (SESSION_COOKIE_SECURE=true).
+            samesite="none" if config.SESSION_COOKIE_SECURE else "strict",
             secure=config.SESSION_COOKIE_SECURE,
             max_age=config.SESSION_TTL_SECONDS,
         )

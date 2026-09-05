@@ -23,7 +23,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script_stop: true
           # Forward these runner env vars into the remote shell.
-          envs: OPENROUTER_API_KEY,REDIS_PASSWORD,CORS_ORIGINS,SESSION_COOKIE_SECURE
+          envs: OPENROUTER_API_KEY,REDIS_PASSWORD,CORS_ORIGINS,SESSION_COOKIE_SECURE,API_HOSTNAME,COMPOSE_PROFILES
           # Everything below runs ON the server.
           script: |
             set -euo pipefail
@@ -42,6 +42,8 @@ jobs:
             REDIS_PASSWORD=${REDIS_PASSWORD}
             CORS_ORIGINS=${CORS_ORIGINS}
             SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE}
+            API_HOSTNAME=${API_HOSTNAME}
+            COMPOSE_PROFILES=${COMPOSE_PROFILES}
             EOF
             chmod 600 .env
 
@@ -62,7 +64,10 @@ jobs:
           # CORS_ORIGINS: comma-separated frontend origins; leave unset for a
           # same-origin (reverse-proxy) setup, which then allows no cross-origin calls.
           CORS_ORIGINS: ${{ vars.CORS_ORIGINS }}
-          # Secure cookies require HTTPS. This deployment serves plain HTTP on
-          # port 8000, so the default is "false"; set the repo variable to
-          # "true" as soon as TLS (e.g. Caddy/nginx) is added in front.
+          # Plain-HTTP default (SameSite=Strict cookies). Set to "true" when TLS
+          # is enabled — required for a cross-site frontend (Vercel/GitHub Pages).
           SESSION_COOKIE_SECURE: ${{ vars.SESSION_COOKIE_SECURE || 'false' }}
+          # Public hostname for the Caddy TLS proxy (needs a DNS A record to this
+          # server). Set COMPOSE_PROFILES to "tls" to enable the caddy service.
+          API_HOSTNAME: ${{ vars.API_HOSTNAME }}
+          COMPOSE_PROFILES: ${{ vars.COMPOSE_PROFILES }}
